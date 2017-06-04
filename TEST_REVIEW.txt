@@ -1,0 +1,35 @@
+#############
+OCP Chapter 1
+#############
+
+
+
+#############
+OCA Chapter 1
+#############
+	
+	answer			result	
+1	A,B				FAIL	OK		
+2	D				OK
+3	B				FAIL	OK
+4	A,B				OK
+5	C,D				OK
+6	E				OK
+7	A,B,C			OK
+8	B				OK
+9	A,C,D,E 		OK
+10	E				OK
+11	C,D				OK
+12	G				OK
+13	A,D				OK
+14	D				OK
+15	A,E				OK
+16	B,C,D			OK
+17	A,E				OK
+18	C,E				FAIL	OK
+19	B				FAIL	OK
+20	B,E				OK
+21	A				OK
+22	B,E				OK
+23	C,D				OK
+
