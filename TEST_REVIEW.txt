@@ -1,8 +1,55 @@
 #############
+OCP Chapter 2
+#############
+
+	answer			result
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+
+#############
 OCP Chapter 1
 #############
 
-
+	answer			result
+1	A				OK
+2	A				OK
+3	C				OK
+4	D				FAIL	OK
+5	A,D				OK
+6	B				OK
+7	E				OK
+8	C				OK		HARD
+9	B				OK		HARD
+10	C				OK
+11	D,G				FAIL	OK
+12	B				FAIL	HARD	OK
+13	B				OK		SOSO
+14	E,F				FAIL	VERY HARD
+15	B,E				OK
+16	E				OK		HARD
+17	B,C				OK		HARD
+18	G				OK		HARD
+19	A,C				OK
+20	A				FAIL	VERY HARD
+21	A,C,E			OK		HARD
 
 #############
 OCA Chapter 1
