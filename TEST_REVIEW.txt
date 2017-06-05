@@ -3,13 +3,13 @@ OCP Chapter 2
 #############
 
 	answer			result
-1
-2
-3
-4
-5
-6
-7
+1	C,E				OK
+2	E				OK
+3	A,C,D			FAIL	SOSO	OK
+4	A,B,C,D			FAIL	HARD	OK	lambda
+5	B,E,F			OK		SOSO
+6	A				OK					lambda
+7	C,E,G,H 		OK		VERY HARD
 8
 9
 10
