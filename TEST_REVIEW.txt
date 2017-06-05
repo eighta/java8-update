@@ -10,19 +10,19 @@ OCP Chapter 2
 5	B,E,F			OK		SOSO
 6	A				OK					lambda
 7	C,E,G,H 		OK		VERY HARD
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
+8	C,F				OK
+9	D,E,F			FAIL	OK
+10	D				OK		HARD
+11	A,F 			OK					lambda
+12	C				OK					lambda
+13	B,C,E			OK
+14	A,B,D,E			OK
+15	B,C				Ok		SOSO
+16	F				OK
+17	B,C,F			OK
+18	A,D,F			FAIL	HARD	OK
+19	A,B,D,E			FAIL	HARD
+20	A				OK
 
 #############
 OCP Chapter 1
