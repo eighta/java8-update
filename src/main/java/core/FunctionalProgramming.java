@@ -40,6 +40,9 @@ package core;
  * 
  * Alternatively, a return statement is optional when the return type of the method is void.
  * 
+ * Applying the Predicate Interface
+ * PAGE 60
+ * 
  */
 public class FunctionalProgramming {
 	
@@ -66,7 +69,7 @@ public class FunctionalProgramming {
 	class ClaseConInterfaceFuncional implements Sprint{
 
 		@Override
-		public void sprint(Integer i) {}
+		public int sprint(Integer i) {return 1;}
 		
 		@Override
 		public void defaultMethod(){System.out.println("defaultMethod OVERRIDE");};
