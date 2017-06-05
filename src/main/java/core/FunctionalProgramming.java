@@ -23,15 +23,29 @@ package core;
  * 	
  * 	() -> new Duck()
  * 
- * Spotting Invalid Lambdas <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<PAGE 58
+ * a pair of statement braces {} around the body of
+ * the lambda expression. This allows you to write multiple lines of code in the body of the
+ * lambda expression, as you might do when working with an if statement or while loop.
  * 
+ * What’s tricky here is that when you add braces {}, you must explicitly terminate each
+ * statement in the body with a semicolon;
+ * 
+ * we were able to omit the braces {}, semi‐colon;, and return statement,
+ * because this is a special shortcut that Java allows for single‐line lambda bodies.
+ * This special shortcut doesn’t work when you have two or more statements.
+ * 
+ * When using {} in the body of the lambda expression, 
+ * you must use the return statement if the functional interface method
+ * that lambda implements returns a value.
+ * 
+ * Alternatively, a return statement is optional when the return type of the method is void.
  * 
  */
 public class FunctionalProgramming {
 	
 	{
 		//Java relies on context when figuring out what lambda expressions mean.
-		Sprint sprint = i -> {i++;};
+		Sprint sprint = i -> {return 1;};
 	}
 	
 	
@@ -41,7 +55,7 @@ public class FunctionalProgramming {
 	the compiler will detect this error and not compile.*/
 	@FunctionalInterface
 	public interface Sprint {
-		public void sprint(Integer i);
+		public int sprint(Integer i);
 		//ERROR WITH A SECOND METHOD 
 		//public void anotherMethod();
 		
