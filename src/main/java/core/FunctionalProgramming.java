@@ -40,6 +40,21 @@ package core;
  * 
  * Alternatively, a return statement is optional when the return type of the method is void.
  * 
+ * 
+ * >>> package java.util.function
+ * Functional interfaces provide target types for lambda expressions and method references.
+ *
+ *
+ * Predicate<T> 	
+ *	Represents a predicate (boolean-valued function) of one argument.
+ *
+ * Consumer<T> 	
+ *  Represents an operation that accepts a single input argument and returns no result.
+ *
+ * Supplier<T> 	
+ *  Represents a supplier of results.
+ *
+ * 
  * Applying the Predicate Interface
  * PAGE 60
  * 
@@ -49,6 +64,24 @@ public class FunctionalProgramming {
 	{
 		//Java relies on context when figuring out what lambda expressions mean.
 		Sprint sprint = i -> {return 1;};
+		
+		long l = 0xA;
+		float f = 07;
+		byte oc = 07;
+		int octal = 01;
+		int numero1 = 0xAFFF;
+		
+		float flo = 1__2.2___2F;
+		long llol = 12______2L;
+		
+		
+		int numero = 0b10___1_010____101____0100____101;
+		
+		int mil = 1__00_______0;
+		
+		System.out.println(">"+mil);
+		System.out.println(">"+mil);
+		
 	}
 	
 	
