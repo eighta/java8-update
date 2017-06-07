@@ -5,6 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ 	Collections
+ 	
+ 	A collection is a group of objects contained in a single object.
+ 	
+ 	The Java Collections Framework is a set of classes in java.util for storing collections.
+ 
  
  	########
  	Arreglos
@@ -21,6 +27,9 @@ import java.util.List;
  	####
  	List	extends Collection<E> extends Iterable<E>
  	####
+ 	A list is an ordered collection of elements that allows duplicate entries.
+ 	Elements in a list can be accessed by an int index.
+ 	
  	ArrayList 
  		-cannot contain primitives
  		
@@ -32,23 +41,25 @@ import java.util.List;
  			y al intentar adicionar o remover items lanza un:
  			UnsupportedOperationException
  	
- 	
- 	
  	###
- 	Map		NO TIENE SUPER INTERFACES
+ 	Set		extends Collection<E> extends Iterable<E>
  	###
+ 	A set is a collection that does not allow duplicate entries.
  	
  	#####
  	Queue	extends Collection<E> extends Iterable<E>
  	#####
- 	
+ 	A queue is a collection that orders its elements in a specific order for processing.
  	
  	###
- 	Set		extends Collection<E> extends Iterable<E>
+ 	Map		NO TIENE SUPER INTERFACES
  	###
+ 	A map is a collection that maps keys to values, with no duplicate keys allowed.
+	The elements in a map are key/value pairs.
  
- 
- 
+ 	Common Collections Methods
+ 	==========================
+ 	PAGE 125
  
  */
 

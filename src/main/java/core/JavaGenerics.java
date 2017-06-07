@@ -1,5 +1,7 @@
 package core;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,10 +80,14 @@ import pojo.Robot;
 	
 	Types of bounds
 	---------------
+	*****
 	**Unbounded wildcard				= ?
+	*****
 	Means whatever
 	
+	*****
 	**Wildcard with an upper bound		= ? extends type
+	*****
 	
 	>>>public static long total(List<? extends Number> list){}
 	Este metodo acepta un argumento de tipo:
@@ -89,14 +95,24 @@ import pojo.Robot;
 	o sus subclases
 		List<Integer>
 		List<Long>
-		
 	
+	-----------------------------------------------------------------------
+	OJO: Cuanto un tipo esta definido por Unbounded wildcard o upper bound
+	la coleccion becomes logically immutable  
 	
+	List<? extends Bird> birds = new ArrayList<Bird>();
+	// DOES NOT COMPILE
+	birds.add(new Sparrow());
+	-----------------------------------------------------------------------
+	
+	*****
 	**Wildcard with a lower bound		= ? super type
+	*****
 	
+	public static void addSound(List<? super String> list) {list.add("quack");}
 	
-	
-
+	With a lower bound, we are telling Java that the list will be a list of String 
+	objects or a list of some objects that are a superclass of String.
 */
 public class JavaGenerics {
 
@@ -125,7 +141,6 @@ public class JavaGenerics {
 		public void ship(Object t) { }
 	}
 	
-	
 	//Generic Class
 	private class Crate<T> {
 		private T contents;
@@ -144,6 +159,21 @@ public class JavaGenerics {
 	}
 	
 	{
+		
+		//Lower-Bounded Wildcards
+		List<? super IOException> exceptionsList = new ArrayList<Exception>();
+		// DOES NOT COMPILE
+		//exceptionsList.add(new Exception());
+		exceptionsList.add(new IOException());
+		exceptionsList.add(new FileNotFoundException());
+		/*explicacion:
+		
+		exceptionsList es una lista que puede ser del tipo:
+		List<IOException> o List<Exception> o List<Object>
+		
+		exceptionsList.add(new Exception()); no compila porque podriamos tener
+		una lista de List<IOException> y un objeto del tipo Exception no cabe aqui
+		*/
 		
 		//Upper-Bounded Wildcards
 		// DOES NOT COMPILE
