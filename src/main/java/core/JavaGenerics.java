@@ -13,6 +13,8 @@ import pojo.Robot;
 	
 	They do show up frequently in the code you call, such as the Java Collections Framework.
 	
+	Collections written without generics are also known as raw collections
+	
 	Generic Classes
 	===============
 	You can introduce generics into your own classes. The syntax for introducing a generic is to
@@ -64,11 +66,44 @@ import pojo.Robot;
 	
 	Generic Methods
 	===============
-	PAGE 114
+	It is also possible to declare them on the method level
+	
+	public static <T> void sink(T t) { }
+	
+	Bounds
+	======
+	Bounded wildcards restrict what types can be used in that wildcard position.
+	A bounded parameter type is a generic type that specifies a bound for the generic.
+	A wildcard generic type is an unknown generic type represented with a question mark (?).
+	
+	Types of bounds
+	---------------
+	**Unbounded wildcard				= ?
+	Means whatever
+	
+	**Wildcard with an upper bound		= ? extends type
+	
+	>>>public static long total(List<? extends Number> list){}
+	Este metodo acepta un argumento de tipo:
+		List<Number>
+	o sus subclases
+		List<Integer>
+		List<Long>
+		
+	
+	
+	**Wildcard with a lower bound		= ? super type
+	
+	
+	
 
 */
 public class JavaGenerics {
 
+	//Generic Methods
+	public static <T> Crate<T> ship(T t) {return new JavaGenerics(). new Crate<T>();}
+	public static <T> T sink(T t) {return t; }
+	
 	//Generic Interface
 	public interface Shippable<T> {
 		void ship(T t);
@@ -96,6 +131,7 @@ public class JavaGenerics {
 		private T contents;
 		public T emptyCrate() {return contents;}
 		public void packCrate(T contents) {this.contents = contents;}
+		
 	}
 	
 	//Generic Class with two generic parameters
@@ -107,8 +143,31 @@ public class JavaGenerics {
 		} 
 	}
 	
-	
 	{
+		
+		//Upper-Bounded Wildcards
+		// DOES NOT COMPILE
+		//List<Number> listUpperBoundedError = new ArrayList<Integer>();
+		List<? extends Number> listUpperBounded = new ArrayList<Integer>();
+		List<? extends Number> listUpperBoundedLong = new ArrayList<Long>();
+		
+		//Problema en asignacion de coleciones genericas
+		List<Integer> numbersList = new ArrayList<>();
+		numbersList.add(new Integer(42));
+		 //error de compilacion: no es posible realizar dicha asignacion 
+		 //List<Object> objectsList = numbersList;
+		//solucion utilizando "Unbounded wildcard"
+		List<?> objectsList = numbersList;
+		
+		//Problema en tipeado en arreglos
+		Integer[] numbers = { new Integer(42)};
+		Object[] objects = numbers;
+		 //OJO Exception: aunque la asignacion anterior fue permita, por debajo el arreglo sigue siendo de Integer
+		 //si se intenta asigar un dato de otro tipo, entonces: java.lang.ArrayStoreException
+		 //objects[0] = "forty two";
+		
+		//Generic Method: you can specify the type explicitly to make it obvious what the type is:
+		JavaGenerics.<String>ship("1");
 		
 		Crate<String> crate = new Crate<String>();
 		crate.emptyCrate();
@@ -128,6 +187,29 @@ public class JavaGenerics {
 		List<String> namesListWithDiamond = new ArrayList<>();
 		
 	}
+	
+	public static void main(String[] args) {
+		
+		new JavaGenerics();
+		
+		GenericClass<Integer> genericClass = new GenericClass<>(1_000);
+		System.out.println( genericClass.methodInstanceGeneric("Nada") );
+		System.out.println( genericClass.methodInstance());
+	}
+}
+
+class GenericClass<T>{
+	
+	private T tInstance;
+	public GenericClass(T tInstance){
+		this.tInstance = tInstance;
+	}
+	
+	public <T> T methodInstanceGeneric(T tLocal){
+		return tLocal;
+	} 
+	
+	public T methodInstance(){return tInstance;}
 }
 
 
