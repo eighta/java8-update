@@ -10,6 +10,16 @@ import java.util.List;
  	A collection is a group of objects contained in a single object.
  	
  	The Java Collections Framework is a set of classes in java.util for storing collections.
+ 	
+ 	Common Collections Methods
+ 	==========================
+ 	
+ 	boolean add(E element)
+ 	boolean remove(Object object)
+ 	boolean isEmpty()
+ 	int size()
+ 	void clear()
+ 	boolean contains(Object object) >>> (This method calls equals() on each element)
  
  
  	########
@@ -24,9 +34,9 @@ import java.util.List;
  	List<String> list = Arrays.asList(array);
  
  
- 	####
+ 	#####################
  	List	extends Collection<E> extends Iterable<E>
- 	####
+ 	#####################
  	A list is an ordered collection of elements that allows duplicate entries.
  	Elements in a list can be accessed by an int index.
  	
@@ -40,26 +50,112 @@ import java.util.List;
  			de igual forma esta caracteristica se conserva en este ArrayList
  			y al intentar adicionar o remover items lanza un:
  			UnsupportedOperationException
+ 			
+ 	((Implementatations))
+ 	*ArrayList extends AbstractList<E> implements List<E>, RandomAccess, Cloneable, Serializable
  	
- 	###
+ 	*LinkedList	extends AbstractSequentialList<E> implements List<E>, Deque<E>, Cloneable, Serializable
+ 	Deque extends Queue<E>
+ 	-has additional methods to facilitate adding or removing from the beginning and/or end of the list
+ 	
+ 	*Vector was the only choice if you wanted a list in java 1.2; is thread-safe
+ 	
+ 	*Stack is a data structure where you add and remove elements from the top of the stack
+ 	-Stack extends Vector, its mean that is old, If you need a stack, use an ArrayDeque instead
+ 	
+ 	[[Methods]]
+ 	void add(int index, E element)
+ 	Adds element at index and moves the rest toward the end
+ 	
+ 	E set(int index, E e)
+ 	Replaces element at index and returns original
+ 	 
+ 	
+ 	#####################
  	Set		extends Collection<E> extends Iterable<E>
- 	###
+ 	#####################
  	A set is a collection that does not allow duplicate entries.
  	
- 	#####
- 	Queue	extends Collection<E> extends Iterable<E>
- 	#####
- 	A queue is a collection that orders its elements in a specific order for processing.
+ 	((Implementatations))
+ 	*HashSet stores its elements in a hash table. This means that it uses the hashCode()
+	method of the objects to retrieve them more efficiently
+	
+	*TreeSet stores its elements in a sorted tree structure.
+	
+	[[Methods]]
+	no news
  	
- 	###
+ 	#####################
+ 	Queue	extends Collection<E> extends Iterable<E>
+ 	#####################
+ 	A queue is a collection that orders its elements in a specific order for processing.
+ 	You use a queue when elements are added and removed in a specific order. 
+ 	Queues are typically used for sorting elements prior to processing them.
+ 	
+ 	Unless stated otherwise, a queue is assumed to be FIFO (first-in, first-out). Some queue
+	implementations change this to use a different order.
+	
+	The other common format is LIFO (last-in, first-out.)
+	
+	((Implementatations))
+	*LinkedList In addition to being a list, it is a double-ended queue.
+	A double-ended queue is different from a regular queue in that you can insert
+	and remove elements from both the front and back of the queue.
+	
+	*ArrayDeque is a "pure" double-ended queue. It was introduced in Java 6, and it
+	stores its elements in a resizable array.
+	Deque (interface) is supposed to be pronounced “deck,” but many people,
+	including the authors, say it wrong as “d-queue.”
+ 	
+ 	[[Methods]]
+ 	E element()
+ 	Returns next element or throws an exception if empty queue
+ 	
+ 	The offer / poll / peek methods are more common.
+ 	------------------------------------------------
+ 	boolean offer(E e)
+ 	Adds an element to the back of the queue and returns whether successful
+ 	
+ 	E poll()
+ 	Removes and returns next element or returns null if empty queue
+ 	
+ 	E peek()
+ 	Returns next element or returns null if empty queue
+ 	
+ 	Others
+ 	------
+ 	void push(E e)
+ 	Adds an element to the front of the queue
+ 	
+ 	E pop()
+ 	Removes and returns next element or throws an exception if empty queue
+ 	
+ 	When talking about LIFO (stack), people say push / poll / peek. 
+ 	When talking about FIFO (single-ended queue), people say offer / poll / peek.
+ 	
+ 	#####################
  	Map		NO TIENE SUPER INTERFACES
- 	###
+ 	#####################
  	A map is a collection that maps keys to values, with no duplicate keys allowed.
 	The elements in a map are key/value pairs.
  
- 	Common Collections Methods
- 	==========================
- 	PAGE 125
+ 	((Implementatations))
+ 	*HashMap 
+ 	stores the keys in a hash table. This means that it uses the hashCode() method
+	of the keys to retrieve their values more efficiently.
+	
+	*LinkedHashMap
+	
+	*TreeMap
+	stores the keys in a sorted tree structure.
+	The main benefit is that the keys are always in sorted order.
+	
+	*Hashtable
+	is like Vector in that it is really old and thread-safe and that you won’t be
+	expected to use it.
+ 	
+ 	[[Methods]]
+ 	PAGE 139
  
  */
 
