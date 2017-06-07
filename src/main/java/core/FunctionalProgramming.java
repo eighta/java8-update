@@ -54,10 +54,6 @@ package core;
  * Supplier<T> 	
  *  Represents a supplier of results.
  *
- * 
- * Applying the Predicate Interface
- * PAGE 60
- * 
  */
 public class FunctionalProgramming {
 	
@@ -75,6 +71,7 @@ public class FunctionalProgramming {
 		long llol = 12______2L;
 		
 		
+		//java 7 underscores
 		int numero = 0b10___1_010____101____0100____101;
 		
 		int mil = 1__00_______0;
