@@ -27,7 +27,7 @@ public class UnaryOperators {
 			int y = ++x * 5 / x-- + --x;
 			
 			-Como no hay parentesis todos los operadores tienen el mismo level
-			-Unary operators tienen precedencia sobre los bynary operators
+			-Unary operators tienen precedencia sobre los binary operators
 			-Toda la expresion se evalua de izquiera a derecha
 			
 			EXPRESSION							CURRENT X VALUE

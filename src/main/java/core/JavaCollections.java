@@ -3,6 +3,8 @@ package core;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  	Collections
@@ -155,7 +157,48 @@ import java.util.List;
 	expected to use it.
  	
  	[[Methods]]
- 	PAGE 139
+ 	void clear()
+ 	Removes all keys and values from the map.
+ 	
+ 	boolean isEmpty()
+ 	Returns whether the map is empty.
+ 	
+ 	boolean containsKey(Object key)
+ 	Returns whether key is in map.
+ 	
+ 	boolean containsValue(Object)
+ 	Returns value is in map.
+ 	
+ 	Set<K> keySet()
+ 	Returns set of all keys.
+ 	
+ 	Collection<V> values()
+ 	Returns Collection of all values.
+ 	
+ 	==========
+ 	Comparable (java.lang.Comparable<T>)
+ 	==========
+ 	
+ 	public interface Comparable<T> {
+		public int compareTo(T o);
+	}
+	
+	There are three rules to know:
+		-The number zero is returned when the current object is equal to the argument to compareTo() .
+		
+		-A number less than zero is returned when the current object is smaller than the argument to compareTo() .
+		
+		-A number greater than zero is returned when the current object is larger than the argument to compareTo() .
+		
+	==========
+	Comparator (java.util.Comparator<T>)
+	==========
+	
+	Sometimes you want to sort an object that did not implement Comparable , or you want to
+	sort objects in different ways at different times.
+	
+	
+ 	
  
  */
 
@@ -164,9 +207,18 @@ public class JavaCollections {
 	{
 		
 		
+		
 	}
 	
 	public static void main(String[] args) {
+		
+		//Set
+		Set<String> setDeStrings = new TreeSet<>();
+		setDeStrings.add("a");
+		setDeStrings.add("B");
+		setDeStrings.add("1");
+		setDeStrings.forEach(System.out::println);
+		
 		
 		//Arreglo to List
 		String[] array = { "gerbil", "mouse" };
