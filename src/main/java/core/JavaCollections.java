@@ -92,7 +92,7 @@ import java.util.function.Function;
 	no news
  	
  	#####################
- 	Queue	extends Collection<E> extends Iterable<E>
+ 	(Deque extends) Queue extends Collection<E> extends Iterable<E>
  	#####################
  	A queue is a collection that orders its elements in a specific order for processing.
  	You use a queue when elements are added and removed in a specific order. 

@@ -1,5 +1,7 @@
 package ocp;
 
+import java.util.ArrayDeque;
+
 public class OcpChapter3Test {
 
 	public interface CanClimb {
@@ -7,8 +9,23 @@ public class OcpChapter3Test {
 	}
 	
 	public static void main(String[] args) {
+		
+		//Practicando Pilas(Stacks) y Colas(Queues)
+		//https://www.slideshare.net/RoverOportunity2012/java-pilas-ycolas
+
+		//===================
+		//PAGE 162 question 4
+		//===================
+		
+		ArrayDeque<String> greetings = new ArrayDeque<String>();
+		greetings.push("hello");
+		greetings.push("hi");
+		greetings.push("ola");
+		
+		greetings.forEach(System.out::println);
+		
+		/*
 		Max max = new Max() {
-			
 			@Override
 			public void doSomething() {
 				System.out.println("DOING SOMETHING");
@@ -19,6 +36,7 @@ public class OcpChapter3Test {
 		max.walk();
 		
 		int a = UnaInterface.AMOUNT;
+		*/
 		
 	}
 	
