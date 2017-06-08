@@ -2,9 +2,13 @@ package core;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  	Collections
@@ -196,21 +200,62 @@ import java.util.TreeSet;
 	
 	Sometimes you want to sort an object that did not implement Comparable , or you want to
 	sort objects in different ways at different times.
-	
-	
  	
- 
  */
 
 public class JavaCollections {
 
-	{
-		
-		
-		
-	}
-	
 	public static void main(String[] args) {
+		
+		//New Java 8 Map API
+		Map<String, String> favorites = new HashMap<>();
+		favorites.put("Jenny", "Bus Tour");
+		//replace (normal way)
+		favorites.put("Jenny", "Airplane");
+		System.out.println(favorites);
+		
+		favorites.put("Tom", null);
+		//There’s another method, called putIfAbsent() , that you can call if you want to set a
+		//value in the map, but this method skips it if the value is already set to a non- null value:
+		favorites.putIfAbsent("Jenny", "Tram");
+		favorites.putIfAbsent("Sam", "Tram");
+		favorites.putIfAbsent("Tom", "Tram");
+		System.out.println(favorites);
+		
+		//merge
+		BiFunction<String, String, String> mapper = (v1, v2)
+				-> v1.length() > v2.length() ? v1: v2;
+				
+		Map<String, String> mergeFavorites = new HashMap<>();
+		mergeFavorites.put("Jenny", "Bus Tour");
+		mergeFavorites.put("Tom", "Tram");
+		String jenny = mergeFavorites.merge("Jenny", "Skyride", mapper);
+		String tom = mergeFavorites.merge("Tom", "Skyride", mapper);
+		System.out.println(mergeFavorites);
+		System.out.println(jenny);
+		System.out.println(tom);
+		
+		//computeIfPresent
+		//In a nutshell, computeIfPresent() calls the BiFunction if the requested key is found
+		Map<String, Integer> counts = new HashMap<>();
+		counts.put("Jenny", 1);
+		BiFunction<String, Integer, Integer> mapper1 = (k, v) -> v + 1;
+		Integer jenny1 = counts.computeIfPresent("Jenny", mapper1);
+		Integer sam = counts.computeIfPresent("Sam", mapper1);
+		System.out.println(counts); // {Jenny=2}
+		System.out.println(jenny1); // 2
+		System.out.println(sam); // null
+		
+		//computeIfAbsent
+		//the functional interface runs only when the key isn’t present or is null
+		Map<String, Integer> counts2 = new HashMap<>();
+		counts2.put("Jenny", 15);
+		counts2.put("Tom", null);
+		Function<String, Integer> mapper2 = (k) -> 1;
+		Integer jenny2 = counts2.computeIfAbsent("Jenny", mapper2); // 15
+		Integer sam2 = counts2.computeIfAbsent("Sam", mapper2); // 1
+		Integer tom2 = counts2.computeIfAbsent("Tom", mapper2); // 1
+		System.out.println(counts2); // {Tom=1, Jenny=15, Sam=1}
 		
 		//Set
 		Set<String> setDeStrings = new TreeSet<>();
@@ -218,7 +263,6 @@ public class JavaCollections {
 		setDeStrings.add("B");
 		setDeStrings.add("1");
 		setDeStrings.forEach(System.out::println);
-		
 		
 		//Arreglo to List
 		String[] array = { "gerbil", "mouse" };
@@ -255,12 +299,8 @@ public class JavaCollections {
 	 	
 	 	Collections.sort(list4search);
 	 	System.out.println(Collections.binarySearch(list4search, 3)); // 0
+
 	 	
-	 	//System.out.println(numbersAsList);
-	 	
-	 	
-//	 	System.out.println(listInvariable.getClass());
-//	 	System.out.println((new ArrayList<Integer>()).getClass() );
 		
 	}
 	
