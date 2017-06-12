@@ -6,8 +6,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -46,6 +48,13 @@ public class OcpChapter3Test {
 	
 	
 	public static void main(String[] args) {
+		
+		Queue<Integer> listaDeNumeros = new LinkedList<>();
+		listaDeNumeros.add(10);
+		listaDeNumeros.add(12);
+		System.out.println(listaDeNumeros);
+		listaDeNumeros.remove(1);
+		System.out.println(listaDeNumeros);
 		
 		ArrayDeque<?> list = new ArrayDeque<String>();
 		//showSize(list);

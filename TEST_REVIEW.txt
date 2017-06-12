@@ -1,7 +1,6 @@
 #############
 OCP Chapter 3
 #############
-page: 166, 554
 
 	answer			result
 1	A,B,E			FAIL	HARD
@@ -17,19 +16,18 @@ page: 166, 554
 11	A				OK
 12	A,B,D			OK
 13	A,B,E			FAIL	
-14	
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
+14	C				OK
+15	A				FAIL	HARD	OK
+16	B,D,F			OK
+17	B,F				FAIL	EASY
+18	A,B,C,F			FAIL	HARD
+19	A,C				FAIL	VERY HARD
+20	E				OK
+21	A,F				OK
+22	B				OK
+23	A,B				FAIL	HARD	OK
+24	B,C,F			FAIL	DUMB
+25	F				OK		SOSO
 
 #############
 OCP Chapter 2
