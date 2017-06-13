@@ -1,12 +1,19 @@
 package core;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ 	Streams
  
 	A stream in Java is a sequence of data. 
 	A stream pipeline is the operations that run on a stream to produce a result.
@@ -49,7 +56,7 @@ import java.util.stream.Stream;
 	  
 	Using parallel streams is like setting up multiple tables of workers who
 	are able to do the same task. Painting would be a lot faster if we could have fi ve painters
-	painting different signs at once. Just keep in mind that it isn’t worth working in parallel for
+	painting different signs at once. Just keep in mind that it isnt worth working in parallel for
 	small streams. There is an overhead cost in coordinating the work among all of the workers
 	operating in parallel.
  	
@@ -58,10 +65,18 @@ import java.util.stream.Stream;
 	You can perform a terminal operation without any intermediate operations but not the
 	other way around.
 	
-	Reductions are a special type of terminal operation where all of the contents of the stream are combined
+	Reductions are a special type of "terminal operation" where all of the contents of the stream are combined
 	into a single primitive or Object.
  	
- 	PAG 193 method reduce
+ 	
+ 	Using Common Intermediate Operations
+ 	------------------------------------
+ 	
+ 	PAG 196
+ 	
+ 	
+ 	
+ 	
  */
 
 
@@ -70,10 +85,83 @@ public class TheStreams {
 	{
 		
 		//[[[Methods on Stream]]]
+		
+		
+		//----------
+		//Reductions
+		//----------
+		
 		Stream<Double> numerosInfinitos = Stream.generate(Math::random);
 		
 		List<Integer> enteros = Arrays.asList(500, 0, 1, 2, 3, 500, 99, 101, 200);
 		Stream<Integer> enterosStream = enteros.stream();
+		
+		//collect()
+		
+		class MyTreeSet extends TreeSet<String>{
+			private static final long serialVersionUID = 7470509819437048738L;
+			//default
+			MyTreeSet(){System.out.println("MyTreeSet is Instancing...");}
+			
+			@Override
+			public boolean add(String e){
+				System.out.println("Adding: " + e);
+				return super.add(e);
+			}
+			
+			@Override
+			public  boolean addAll(Collection<? extends String> c){
+				System.out.println("addAll: " + c);
+				return super.addAll(c);
+			}
+		}
+		
+		Stream<String> flujoDeLetras = Stream.of("w","o","l","f");
+		
+		MyTreeSet myTreeSet = flujoDeLetras.collect(MyTreeSet::new, MyTreeSet::add, MyTreeSet::addAll);
+		System.out.println(myTreeSet);
+		
+		//or using Collectors pre-definidos
+		Stream<String> streamC = Stream.of("w", "o", "l", "f");
+		TreeSet<String> setC = streamC.collect(Collectors.toCollection(MyTreeSet::new));
+		System.out.println(setC);
+		
+		//or a Set
+		
+		Set<String> setCollect = Stream.of("w", "o", "l", "f").collect(Collectors.toSet());
+		System.out.println(setCollect); // [f, w, l, o]
+		
+		
+		
+		
+		//reduce()
+		//The reduce() method combines a stream into a single object. As you can tell from the
+		//name, it is a reduction.
+		//>>>using identity
+		Stream<String> stream = Stream.of("w", "o", "l", "f");
+		String identity = "";
+		String word = stream.reduce(identity, (s, c) -> s + c);
+		System.out.println(word);
+		//or using method reference
+		String word2 = Stream.of("w", "o", "l", "f").reduce("", String::concat);
+		System.out.println(word2);
+		
+		//otro ejemplo
+		Stream<Integer> stream2 = Stream.of(3, 5, 6);
+		System.out.println(stream2.reduce(1, (a, b) -> a*b));
+		
+		//>>>sin el identity (solo el acumulator)
+		Optional<Integer> reduce = Stream.of(1,2,3).reduce((a, b) -> a*b);
+		System.out.println(reduce);
+		
+		//>>>processing collections in parallel
+		//when we are processing collections in parallel
+		BiFunction<Integer,Integer,Integer> op = (acum, currentData) -> {System.out.println("(" +acum+","+currentData +")"); return acum * currentData;};
+		BinaryOperator<Integer> op2 = (a, b) -> a * b;
+		
+		System.out.println("->" + Stream.of(3, 5, 6).reduce(1, op, op2));
+		System.out.println("->" + Stream.<Integer>empty().reduce(1, op, op2));
+		
 		
 		//forEach()
 		//A looping construct is available. As expected, calling forEach() on an infi nite stream does
@@ -81,12 +169,9 @@ public class TheStreams {
 		//Notice that this is the only terminal operation with a return type of void
 		
 		//While forEach() sounds like a loop, it is really a terminal operator for streams. Streams
-		//cannot use a traditional for loop to run because they don’t implement the Iterable interface.
-		enteros.forEach(System.out::print);
+		//cannot use a traditional for loop to run because they dont implement the Iterable interface.
+		enteros.stream().forEach(System.out::print);
 		
-		
-		
-		//Reductions
 		
 		//allMatch() , anyMatch() and noneMatch()
 		//The allMatch() , anyMatch() and noneMatch() methods search a stream and return infor-
@@ -98,8 +183,6 @@ public class TheStreams {
 		System.out.println( miscList.stream().anyMatch(predicate) );
 		System.out.println( miscList.stream().allMatch(predicate) );
 		System.out.println( miscList.stream().noneMatch(e -> false) );
-		
-		
 		
 		//findAny() and findFirst()
 		//These methods are terminal operations but not reductions. The reason is that they some-
