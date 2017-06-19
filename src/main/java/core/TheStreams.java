@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TheStreamsOrganizado {
+public class TheStreams {
 
 	{
 /**
@@ -451,9 +451,7 @@ public class TheStreamsOrganizado {
 		
 	}
 	
-	
-	
 	public static void main(String[] args) {
-		new TheStreamsOrganizado();
+		new TheStreams();
 	}
 }
