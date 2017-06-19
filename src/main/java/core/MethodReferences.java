@@ -65,7 +65,6 @@ public class MethodReferences {
 		Consumer<List<Integer>> methodRefStatic = Collections::sort;
 		Consumer<List<Integer>> lambdaMethodRefStatic = l -> Collections.sort(l);
 		
-		
 		//Using Lambda
 		Comparator<Duck> byWeight = (d1, d2) -> DuckHelper.compareByWeight(d1, d2);
 		
