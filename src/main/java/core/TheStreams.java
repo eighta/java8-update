@@ -1,5 +1,6 @@
 package core;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -7,13 +8,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class TheStreams {
@@ -85,7 +93,6 @@ public class TheStreams {
 	In Java, the Stream interface is in the java.util.stream package. There are a few ways to
 	create a finite stream:
  */
-		
 		//EMPTY STREAM
 		Stream<String> emptyStream = Stream.empty();
 		System.out.println("emptyStream: " + emptyStream.count());
@@ -438,18 +445,515 @@ public class TheStreams {
 				-------------------------------------
 	Stream 	->	|	filter() ->	sorted() -> limit()	|	->	forEach()
 				-------------------------------------
- 
- 	205
- 
  */
+		
+/**
+  	EXAMPLE1: 
+ 		
+		Stream.generate( () -> "Elsa" )			//infinito
+			.filter( n -> n.length() == 4 )		//filtro
+			.sorted()							//espera a que tenga todos los elementos (infinito)
+			.limit(2)
+			.forEach(System.out::println);
+			
+	EXAMPLE2:
+	
+		Stream.generate(() -> "Elsa")			//infinito
+			.filter(n -> n.length() == 4)		//filtra
+			.limit(2)							//cuenta dos elementos
+			.sorted()							//los dos anterioes elementos los ordena
+			.forEach(System.out::println);		//los imprime
+			
+	EXAMPLE3:
+		
+		Stream.generate(() -> "Olaf Lazisson")	//infinito
+			.filter(n -> n.length() == 4)		//filtra (queda inifinito porque le filtro no deja pasar a nadie)
+			.limit(2)							
+			.sorted()
+			.forEach(System.out::println);
+			
+	EXAMPLE4:
+	
+		Stream.iterate(1, x -> x + 1)			//infinito
+			.limit(5)							//limita a 5 elementos
+			.filter(x -> x % 2 == 1)			//filtra impar
+			.forEach(System.out::print);		//imprime
+			
+	EXAMPLE5:
+	
+		Stream.iterate(1, x -> x + 1)			//infinito
+			.limit(5)							//limita a 5 elementos
+			.peek(System.out::print)			//PEEK imprime el actual elemento
+			.filter(x -> x % 2 == 1)			//filtra impar
+			.forEach(System.out::print);		//imprime
+			
+	EXAMPLE6:
+	
+		Stream.iterate(1, x -> x + 1)			//infinito
+			.filter(x -> x % 2 == 1)			//filtra impares
+			.limit(5)							//limita a 5 elementos
+			.forEach(System.out::print); 		//imprime
+			
+	EXAMPLE7:
+	
+		Stream.iterate(1, x -> x + 1)			//infinito
+			.filter(x -> x % 2 == 1)			//filtra impares
+			.peek(System.out::print)			//PEEK imprime el actual elemento
+			.limit(5)							//limita a 5 elementos
+			.forEach(System.out::print);		//imprime
+	
+	Working with Primitives
+	-----------------------
+	
+	Suppose that we want to calculate the sum of numbers in a finite
+*/
+		Stream<Integer> sumaNumerosStream = Stream.of(1, 2, 3);
+		System.out.println("sumaNumerosStream: " + sumaNumerosStream.reduce(0, (s, n) -> s + n));
+		
+		//otra forma
+		sumaNumerosStream = Stream.of(1, 2, 3);
+		IntStream numeroEnterosStream = sumaNumerosStream.mapToInt(x -> x);
+		int suma = numeroEnterosStream.sum();
+		System.out.println("suma: " + suma);
 
-		Stream<Integer> numerosStream = Stream.of(1,2,3,4);
-		long numerosStreamCount = numerosStream.count();
-		System.out.println(numerosStreamCount);
-		//numerosStream.forEach(System.out::println);
+		//CALCULO DE PROMEDIO
+		sumaNumerosStream = Stream.of(1, 2, 3);
+		numeroEnterosStream = sumaNumerosStream.mapToInt(x -> x);
+		OptionalDouble average = numeroEnterosStream.average();
+		System.out.println("average: " + average.getAsDouble());
+		
+/**
+ 	Creating Primitive Streams
+ 	--------------------------
+ 	
+ 	Here are three types of primitive streams:
+	-IntStream: Used for the primitive types int, short, byte, and char
+	-LongStream: Used for the primitive type long
+	-DoubleStream: Used for the primitive types double and float
+
+	Why doesn't each primitive type have its own primitive stream? 
+		These three are the most common, so the API designers went with them.
+ 		
+ 		Stream, DoubleStream, IntStream , or LongStream
+ */
+		
+		DoubleStream doubleEmptyStream = DoubleStream.empty();
+		doubleEmptyStream.forEach(System.out::print);
+		
+		DoubleStream varargs = DoubleStream. of (1.0, 1.1, 1.2);
+		varargs.forEach(System.out::print);
+		
+		DoubleStream randomDouble = DoubleStream.generate (Math::random);
+		DoubleStream fractionsDouble = DoubleStream.iterate (.5, d -> d / 2);
+		
+		//IntStreams
+		IntStream countInt = IntStream.iterate(1, n -> n+1).limit(5);
+		countInt.forEach(System.out::println);
+		
+		//more simple
+		//The range() method indicates that we want the numbers 1–6, not including the number 6.
+		System.out.println("simple: ");
+		IntStream range = IntStream.range(1, 6);
+		range.forEach(System.out::println);
+		
+		//rangeClosed(1,5)
+		IntStream rangeClosed = IntStream.rangeClosed(1, 5);
+		rangeClosed.forEach(System.out::println);
+		
+/**
+	Mapping methods between types of streams
+	----------------------------------------
+	
+	|--------------------------------------------------------------------------------------------|
+	|Source			2_Stream			2_DoubleStream			2_IntStream			2_LongStream |
+	|--------------------------------------------------------------------------------------------|
+	|Stream			map					mapToDouble				mapToInt			mapToLong	 
+	|
+	|DoubleStream	mapToObj			map						mapToInt			mapToLong
+	|
+	|IntStream		mapToObj			mapToDouble				map					mapToLong
+	|
+	|LongStream		mapToObj			mapToDouble				mapToInt			map
+	|--------------------------------------------------------------------------------------------|
+	
+	Obviously, they have to be compatible types for this to work. Java requires a mapping
+		function to be provided as a parameter, for example:
+ */
+		Stream<String> objStream = Stream.of("penguin", "fish");
+		IntStream intStream = objStream.mapToInt(s -> s.length());
+		
+/**
+	This function that takes an Object, which is a String in this case. 
+	The function returns an int. 
+	The function mappings are intuitive here. 
+	They take the source type and return the target type. 
+	
+	In this example, the actual function type is ToIntFunction .
+
+
+ 	Function parameters when mapping between types of streams
+ 	---------------------------------------------------------
+ 	
+ 	|---------------------------------------------------------------------------------------------------|
+	|Source			2_Stream			2_DoubleStream			2_IntStream			2_LongStream        |
+	|---------------------------------------------------------------------------------------------------|
+	|Stream			Function			ToDoubleFunction		ToIntFunction		ToLongFunction	 
+	|
+	|DoubleStream	DoubleFunction		DoubleUnaryOperator		DoubleToIntFunction	DoubleToLongFunction
+	|
+	|IntStream		IntFunction			IntToDoubleFunction		IntUnaryOperator	IntToLongFunction
+	|
+	|LongStream		LongFunction		LongToDoubleFunction	LongToIntFunction	LongUnaryOperator
+	|----------------------------------------------------------------------------------------------------|
+ 	
+ 	You can also create a primitive stream from a Stream using 
+ 		flatMapToInt(),
+		flatMapToDouble(), or 
+		flatMapToLong(). 
+		
+	For example, 
+		IntStream ints = list.stream().flatMapToInt(x -> IntStream.of(x));
 		
 		
+	Using Optional with Primitive Streams
+	-------------------------------------
+	
+	Now that you know about primitive streams, you can calculate the average in one line:
+ */
+		IntStream rangeClosedStream = IntStream.rangeClosed(1,10);
+		OptionalDouble optional = rangeClosedStream.average();
+
+/**
+ 	The return type is not the Optional you have become accustomed to using. 
+ 		It is a new type called OptionalDouble. 
+ 	
+ 	Why do we have a separate type, you might wonder? 
+ 	Why not just use Optional<Double>? 
+ 	
+ 	The difference is that 
+ 		OptionalDouble is for a primitive and
+		Optional<Double> is for the Double wrapper class. 
+		
+	Working with the primitive optional class looks similar 
+		to working with the Optional class itself:
+
+ 	optional.ifPresent(System.out::println);
+	System.out.println(optional.getAsDouble());
+	System.out.println(optional.orElseGet(() -> Double.NaN));
+
+ 	The only noticeable difference is that we called getAsDouble() rather than get().
+	This makes it clear that we are working with a primitive. 
+	
+	Also, orElseGet() takes a DoubleSupplier instead of a Supplier.
+	
+	Optional types for primitives
+	-----------------------------
+	
+	|-----------------------------------------------------------------|
+	|				OptionalDouble		OptionalInt		OptionalLong  |
+	|-----------------------------------------------------------------|
+	|Getting		getAsDouble()		getAsInt()		getAsLong()	 
+	|
+	|orElseGet()	DoubleSupplier		IntSupplier		LongSupploer
+	|
+	|max()			OptionalDouble		OptionalInt		OptionalLong
+	|
+	|sum()			double				int				long
+	|
+	|avg()			OptionalDouble		OptionalDouble	OptionalDouble
+	|-----------------------------------------------------------------|
+	
+	
+	Summarizing Statistics
+	----------------------
+	You’ve learned enough to be able to get the maximum value from a stream of int primitives.
+	If the stream is empty, we want to throw an exception:
+ */
+		IntStream ints = IntStream.empty();
+		OptionalInt optionaIntMax = ints.max();
+		optionaIntMax.orElse(99);
+		//optionaIntMax.orElseThrow(RuntimeException::new);
+		
+/**
+ 		PAGE 210 - 213
+ 		InterfacesFunctionales con los Streams primitivos 
+ 		
+ 	Working with Advanced Stream Pipeline Concepts
+ 	----------------------------------------------
+ 	
+ 	>Linking Streams to the Underlying Data
+ 	---------------------------------------
+ */
+		List<String> cats = new ArrayList<>();
+		cats.add("Annie");
+		cats.add("Ripley");
+		Stream<String> catsStream = cats.stream();
+		cats.add("KC");
+		System.out.println("cats: " + catsStream.count());
+/**
+ 	Remember that streams are lazily evaluated
+ 	An object is created  "cats.stream()" that knows where to look for the data when it is needed.
+ 	The stream pipeline runs first, looking at the source and seeing three elements.
+
+ 	Chaining Optionals
+ 	------------------
+ 	Suppose that you are given an Optional<Integer> and asked to print the value, but
+	only if it is a three-digit number.
+ */
+		Optional<Integer> optionalInteger = Optional.of(81);
+		if (optionalInteger.isPresent()) { // outer if
+			Integer num = optionalInteger.get();
+			String string = "" + num;
+			if (string.length() == 3) // inner if
+				System.out.println(string);
+		}
+/**
+ 	It works, but it contains nested if statements. That’s extra complexity. 
+ 	Let’s try this again with functional programming:
+ */
+		optionalInteger
+			.map(n -> "" + n) 				// part 1
+			.filter(s -> s.length() == 3) 	// part 2
+			.ifPresent(System.out::println);// part 3
+
+/**
+	Now suppose that we wanted to get an Optional<Integer> representing the length of
+	the String contained in another Optional.
+ */
+		//Optional<String> optionalString = Optional.<String>empty();
+		Optional<String> optionalString = Optional.<String>of("sophie");
+		Optional<Integer> result = optionalString.map(String::length);
+		result.ifPresent(System.out::println);
+		
+/**
+ 	What if we had a helper method that did the logic of calculating something for us and it
+	had the signature static Optional<Integer> calculator(String s)? 
+	Using map doesn't work:
+	
+	// DOES NOT COMPILE
+	Optional<Integer> result = optional.map(ChainingOptionals::calculator); 
+ */
+		Optional<String> anotherOptionalString = Optional.empty();
+		Optional<Integer> resultAnotherOptional = anotherOptionalString.map(TheStreams::calculate);
+		
+		Optional<Optional<Integer>> resultAnotherOptionalOptional = 
+				anotherOptionalString.map(TheStreams::calculateOptional);
+		
+		//definitive solution
+		//avoid double Optional
+		Optional<Integer> flatResult = anotherOptionalString.flatMap(TheStreams::calculateOptional);
+	
+/**
+ 	Checked Exceptions and Functional Interfaces
+ 	--------------------------------------------
+ 	
+ 	TheStreams.create().stream().count();
+ 	
+ 	Nothing new here. The create() method throws a checked exception. The calling
+	method handles or declares it.
+	
+	page 215-216
+	
+	Collecting Results
+	------------------
+
+	>>>Calculates the average for our three core primitive types
+	averagingDouble(ToDoubleFunction f) :Double
+	averagingInt(ToIntFunction f) :Double
+	averagingLong(ToLongFunction f) :Double
+	
+	>>>Counts number of elements
+	counting() :Long
+	
+	>>>Creates a map grouping by the specified function with the optional type 
+		and optional downstream collector
+	groupingBy(Function f) :Map<K, List<T>>
+	groupingBy(Function f, Collector dc) :Map<K, List<T>>
+	groupingBy(Function f, Supplier s, Collector dc) :Map<K, List<T>>
+	
+	>>>Creates a single String using cs as a delimiter between elements if
+		one is specified
+	joining() :String
+	joining(CharSequence cs) :String
+	
+	>>>Finds the largest/smallest elements
+	maxBy(Comparator c) :Optional<T>
+	minBy(Comparator c) :Optional<T>
+
+	>>>Adds another level of collectors
+	mapping(Function f, Collector dc) :Collector
+	
+	>>>Creates a map grouping by the specified predicate with the
+		optional further downstream collector
+	partitioningBy(Predicate p) :Map<Boolean, List<T>>
+	partitioningBy(Predicate p, Collector dc) :Map<Boolean, List<T>>
+	
+	>>>Calculates average, min, max, and so on
+	summarizingDouble(ToDoubleFunction f) :DoubleSummaryStatistics
+	summarizingInt(ToIntFunction f) :IntSummaryStatistics
+	summarizingLong(ToLongFunction f) :LongSummaryStatistics
+	
+	>>>Calculates the sum for our three core primitive types
+	summingDouble(ToDoubleFunction f) :Double
+	summingInt(ToIntFunction f) :Integer
+	summingLong(ToLongFunction f) :Long
+	
+	>>>Creates an arbitrary type of list or set
+	toList() :List
+	toSet() :Set
+	
+	>>>Creates a Collection of the specified type
+	toCollection(Supplier s) :Collection
+	
+	>>>Creates a map using functions to map the keys, values, 
+		an optional merge function, and an optional type
+	toMap(Function k, Function v) :Map
+	toMap(Function k, Function v, BinaryOperator m) :Map
+	toMap(Function k, Function v, BinaryOperator m, Supplier s) :Map
+	
+	Collecting Using Basic Collectors
+	---------------------------------
+ */
+		String[] arrayAnimals = (String[]) Arrays.asList("lions", "tigers", "bears").toArray();
+		Stream<String> ohMy = Stream.of(arrayAnimals);
+		Collector<CharSequence, ?, String> joiningCollector = Collectors.joining(", ");
+		String resultJoined = ohMy.collect(joiningCollector);
+		System.out.println(resultJoined); // lions, tigers, bears
+	
+		//What is the average length of the three animal names?
+		ohMy = Stream.of(arrayAnimals);
+		Collector<String, ?, Double> averagingIntCollector = Collectors.averagingInt(String::length);
+		Double avgResult = ohMy.collect(averagingIntCollector);
+		System.out.println(avgResult);
+
+/**
+ 	You can express yourself using a Stream and then convert to a Collection at the end, 
+ 		for example:
+ */
+		ohMy = Stream.of("lions", "tigers", "bears");
+		Set<String> collectResult = ohMy
+									.filter(s -> s.startsWith("t"))
+									.collect(Collectors.toCollection(TreeSet::new));
+		
+		System.out.println(collectResult); // [tigers]
+		
+/**
+ 	Collecting into Maps 
+ 	--------------------
+ */
+		//create a map from a stream:
+		ohMy = Stream.of("lions", "tigers", "bears");
+	
+		//When creating a map, you need to specify two functions. 
+		//The first function tells the collector how to create the key.
+		//The second function tells the collector how to create the value.
+		Collector<String, ?, Map<String, Integer>> mapCollector 
+				= Collectors.toMap(s -> s, String::length);
+		
+		Map<String, Integer> mapResult = ohMy.collect(mapCollector);
+		System.out.println(mapResult);
+		
+/**
+	Las otras dos metodos:
+	-toMap(Function k, Function v, BinaryOperator m) :Map
+	
+	Utilizado en la circunstancia en que Dos key sean IDENTIFICAS (equals)
+	el tercer parametro indica como resolver el value, dado los dos elementos
+	por ello el BinaryOperator
+	
+	-toMap(Function k, Function v, BinaryOperator m, Supplier s) :Map
+	
+	Y esta tercera forma, recibe como cuarto parametro el Supplier, 
+	lo cual indica el tipo (clase) de implementacion del Map
+	ejemplo: TreeMap::new 
+	
+	Collecting Using Grouping, Partitioning, and Mapping
+	----------------------------------------------------
+	Now suppose that we want to get groups of names by their length. 
+	We can do that by saying that we want to group by length:
+ */
+		ohMy = Stream.of("lions", "tigers", "bears");
+		Map<Integer, List<String>> mapGroupingBy = 
+				ohMy.collect(
+						Collectors.groupingBy(String::length));
+		System.out.println(mapGroupingBy);
+/**
+	The groupingBy() collector tells collect() that it should group all of the elements of
+	the stream into lists, organizing them by the function provided. 
+	This makes the keys in the map the function value and the values the function results.
+	
+	Suppose that we don’t want a List as the value in the map and prefer a Set instead.
+ */
+		ohMy = Stream.of("lions", "tigers", "bears");
+		
+		//Collector<String, ?, Map<Integer, Set<Object>>> groupingByUsingSet 
+		// = Collectors.groupingBy(String::length, Collectors.toSet() );
+		
+		Map<Integer, Set<String>> mapSet = ohMy.collect(
+					Collectors.groupingBy(String::length, Collectors.toSet()));
+		System.out.println(mapSet);
+		
+/**
+ 	We can even change the type of Map returned through yet another parameter:
+ */
+		ohMy = Stream.of("lions", "tigers", "bears");
+		TreeMap<Integer, Set<String>> mapCustomSet = ohMy.collect(
+		Collectors.groupingBy(String::length, TreeMap::new, Collectors.toSet()));
+		System.out.println(mapCustomSet); // {5=[lions, bears], 6=[tigers]}
+
+/**
+ 	Partitioning
+ 	------------
+ 	Partitioning is a special case of grouping. With partitioning, there are only two possible
+	groups—true and false. Partitioning is like splitting a list into two parts
+ 	
+ */
+		ohMy = Stream.of("lions", "tigers", "bears");
+		Map<Boolean, List<String>> map = ohMy.collect(
+		Collectors.partitioningBy(s -> s.length() <= 5));
+		System.out.println(map); // {false=[tigers], true=[lions, bears]}
+		
+/**
+	-counting() collector
+ */	
+		ohMy = Stream.of("lions", "tigers", "bears");
+		Map<Integer, Long> mapCounting = ohMy.collect(
+				Collectors.groupingBy(String::length, Collectors.counting()));
+		System.out.println(mapCounting); // {5=2, 6=1}
+		
+/**
+	-mapping() collector (XXX TOPIC HARD XXX)
+	Finally, there is a mapping() collector that lets us go down a level and add another
+	collector. Suppose that we wanted to get the first letter of the first animal alphabetically of
+	each length. Why? Perhaps for random sampling. The examples on this part of the exam
+	are fairly contrived as well. We’d write the following:
+ */
+		ohMy = Stream.of("lions", "tigers", "bears");
+		
+		Map<Integer, Optional<Character>> mapCustomGrouping = ohMy.collect(
+				Collectors.groupingBy(
+						String::length,
+						Collectors.mapping(s -> s.charAt(0),
+						Collectors.minBy( Comparator.naturalOrder() ) ) ) );
+		System.out.println(mapCustomGrouping); // {5=Optional[b], 6=Optional[t]}
+		
+/**
+ 	Comparing it to the previous example, you can see that we replaced counting() with mapping(). 
+ 		It so happens that mapping() takes two parameters: 
+ 		the function for the value and how to group it further.
+ 		
+ 		
+ 	-reducing() collector
+ 	There is one more collector called reducing(). You don’t need to know it for the exam.
+	It is a general reduction in case all of the previous collectors don’t meet your needs.
+ */
 	}
+	
+	private static List<String> create() throws IOException {throw new IOException();}
+	
+	public static Optional<Integer> calculateOptional (String source){
+		return Optional.ofNullable(source).map(s -> s.length()); }
+	public static Integer calculate (String s){return s.length();	}
 	
 	public static void main(String[] args) {
 		new TheStreams();
