@@ -775,8 +775,8 @@ public class TheStreams {
 	groupingBy(Function f, Collector dc) :Map<K, List<T>>
 	groupingBy(Function f, Supplier s, Collector dc) :Map<K, List<T>>
 	
-	>>>Creates a single String using cs as a delimiter between elements if
-		one is specified
+	>>>Creates a single String using cs (,) as a delimiter between elements 
+		IF one is specified
 	joining() :String
 	joining(CharSequence cs) :String
 	
@@ -861,7 +861,7 @@ public class TheStreams {
 	Las otras dos metodos:
 	-toMap(Function k, Function v, BinaryOperator m) :Map
 	
-	Utilizado en la circunstancia en que Dos key sean IDENTIFICAS (equals)
+	Utilizado en la circunstancia en que Dos key sean IDENTICAS (equals)
 	el tercer parametro indica como resolver el value, dado los dos elementos
 	por ello el BinaryOperator
 	

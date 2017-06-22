@@ -8,16 +8,16 @@ OCP Chapter 4
 3	A				FAIL	LOOK-BETTER
 4	A,B				OK
 5	B,F				FAIL	HARD
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
+6	A,B,C,D,E		FAIL
+7	F				OK
+8	D,E				OK
+9	B,D				OK
+10	F				OK
+11	D,E				FAIL	VERY-HARD
+12	A,F,G			OK
+13  F				OK
+14	D				OK
+15	D				FAIL
 16
 17
 18
