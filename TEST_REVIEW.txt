@@ -18,11 +18,11 @@ OCP Chapter 4
 13  F				OK
 14	D				OK
 15	D				FAIL
-16
-17
-18
-19
-20
+16	D				FAIL	LOOK-BETTER
+17	E				OK
+18	D				OK
+19	A,C,E			OK
+20	B				OK
 
 
 #############
