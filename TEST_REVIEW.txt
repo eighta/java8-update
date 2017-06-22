@@ -1,4 +1,31 @@
 #############
+OCP Chapter 4
+#############
+
+	answer			result
+1	D				OK
+2	F				OK
+3	A				FAIL	LOOK-BETTER
+4	A,B				OK
+5	B,F				FAIL	HARD
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+
+
+#############
 OCP Chapter 3
 #############
 

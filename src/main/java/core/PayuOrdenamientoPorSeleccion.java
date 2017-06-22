@@ -10,7 +10,7 @@ public class PayuOrdenamientoPorSeleccion {
 		//Randoms
 		Random r = new Random();
 		
-		IntStream.generate( () -> r.nextInt(10) )
+		IntStream.generate( () -> r.nextInt(20) )
 					.limit(10)
 					.sorted()
 					.forEach(System.out::println);

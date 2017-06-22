@@ -160,7 +160,7 @@ interface Max extends InterfaceUno, InterfaceTwo{
 
 interface UnaInterface{
 	int AMOUNT = 10;
-	static void staticMethod(){int a = AMOUNT+1;}
+	static void staticMethod(){int a = AMOUNT+1; /*AMOUNT = 2;*/}
 }
 
 abstract class ClaseAbstracta{}

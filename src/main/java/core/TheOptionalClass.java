@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 /**
  
  	Optional
+ 	--------
  
 	Starting with Java 8
 	
@@ -14,20 +15,29 @@ import java.util.function.Supplier;
 	
 	You can either request an empty Optional 
 		or pass a value for the Optional to wrap
-	
- 
- 	
- 
- 
- *
- *
  */
 
 public class TheOptionalClass {
 
 	{
 		
+		Optional<Integer> optionalInteger = Optional.of(123);
+		System.out.println("optionalInteger: " + optionalInteger);
 		
+		//Consumer
+		optionalInteger.ifPresent( i-> {System.out.println(i - 23);} );
+
+		//NULL (NO VALUE)
+		optionalInteger = Optional.ofNullable(null);
+		System.out.println("optionalInteger: " + optionalInteger);
+		
+		//Supplier
+		int orElse = optionalInteger.orElseGet( () -> new Integer(321) );
+		System.out.println(orElse);
+		
+		try{
+			optionalInteger.orElseThrow( () -> new RuntimeException("orElseThrow"));
+		}catch(Exception e){System.out.println("Exception: " + e);}
 		
 		Optional<Float> optionalValue = Optional.ofNullable(Float.valueOf(3.14f));
 		Consumer<Float> ifPresentConsumer = (f) -> {System.out.println("doing something for: " + f);};

@@ -255,11 +255,11 @@ public class TheStreams {
 		
 /**
  	-collect()
- 	The collect() method is a special type of reduction called a mutable reduction. It is
-	more efficient than a regular reduction because we use the same mutable object while
- 	accumulating. Common mutable objects include StringBuilder and ArrayList. This is a
-	really useful method, because it lets us get data out of streams and into another form. The
-	method signatures are as follows:
+ 	The collect() method is a special type of reduction called a mutable reduction. 
+ 	It is more efficient than a regular reduction because we use the same mutable object while accumulating. 
+ 	Common mutable objects include StringBuilder and ArrayList. 
+ 	This is a really useful method, because it lets us get data out of streams and into another form. 
+ 	The method signatures are as follows:
 	
 		<R> R collect(	Supplier<R> supplier, 
 						BiConsumer<R, ? super T> accumulator,
@@ -335,8 +335,9 @@ public class TheStreams {
 		
 /**
 	-limit() and skip()
-	The limit() and skip() methods make a Stream smaller. They could make a fi nite stream
-	smaller, or they could make a fi nite stream out of an infi nite stream. 
+	The limit() and skip() methods make a Stream smaller. 
+	They could make a finite stream smaller, 
+	or they could make a finite stream out of an infinite stream. 
 	The method signatures are shown here:
 	
 	Stream<T> limit(int maxSize)
@@ -349,14 +350,17 @@ public class TheStreams {
 
 /**
  	-map()
- 	The map() method creates a one-to-one mapping from the elements in the stream to the elements
-	of the next step in the stream.
+ 	The map() method creates a one-to-one mapping 
+ 		from the elements in the stream to the elements of the next step in the stream.
 	
-	<R> Stream<R> map(Function<? super T, ? extends R> mapper)
+	<R> Stream<R> map(Function < ? super T, 	
+								 ? extends R> mapper)
  */
 		Stream<String> monosStream = Stream.of("12345","monkey", "gorilla", "bonobo","1234");
+												//5		6		  7			 6		  4
 		System.out.print("\nmap: ");
-		monosStream.map(String::length).forEach(System.out::print);
+		Optional<Integer> resultadoInt = monosStream.map(String::length).reduce( (x,y) -> x+y );
+		System.out.println("resultadoInt: " + resultadoInt);
 		
 /**
  	-flatMap()
