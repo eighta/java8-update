@@ -15,7 +15,7 @@ public class OcpChapter4Test {
 		Stream<Integer> s = Stream.of(1);
 		IntStream is = s.mapToInt(x -> x);
 		DoubleStream ds = s.mapToDouble(x -> x);
-		Stream<Integer> s2 = ds.mapToInt(x -> x);
+		//Stream<Integer> s2 = ds.mapToInt(x -> x);
 		
 		
 		Supplier<String> sup = String::new;;
