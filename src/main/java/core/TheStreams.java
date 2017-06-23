@@ -62,7 +62,7 @@ public class TheStreams {
 	El snapshot para este Stream pipeline inicia con un "Signal", que es "Take sign out of the box"
 	
 	La "Intermediate Operation" es Paint sign, asi que se necesita de un Worker para que pinte los letreros
-	pero debe esperar la señal de inicio
+	pero debe esperar la signal de inicio
 	
 	Finalmente, en el Stream pipeline la "Intermidiate Operation" cuando termina su labor, 
 	apila los letreros recien pintandos
@@ -114,7 +114,7 @@ public class TheStreams {
 		System.out.print("parallelStreamFromList: " + parallelStreamFromList.count());
 		
 /**
- 	We can’t create an infinite list, though, which makes streams more powerful:
+ 	We cant create an infinite list, though, which makes streams more powerful:
  */
 		
 		//Infinite Streams
@@ -166,7 +166,7 @@ public class TheStreams {
  	-findAny() and findFirst()
  	The findAny() and findFirst() methods return an element of the stream unless the stream
 		is empty. If the stream is empty, they return an empty Optional. This is the first method
-		you’ve seen that works with an infinite stream.
+		you have seen that works with an infinite stream.
 		
 	findAny() is useful when you are working with a parallel stream. 
 		It gives Java the flexibility to return to you the first element it comes 
@@ -216,7 +216,7 @@ public class TheStreams {
  	Notice that this is the only terminal operation with a return type of void .
  	
  	While forEach() sounds like a loop, it is really a terminal operator for streams. Streams
-		cannot use a traditional for loop to run because they don’t implement the Iterable interface.
+		cannot use a traditional for loop to run because they dont implement the Iterable interface.
  */
 		List<Integer> enteros = Arrays.asList(1,2,3);
 		System.out.print("forEach: ");
@@ -421,7 +421,7 @@ public class TheStreams {
  	Putting Together the Pipeline
  	-----------------------------
 
- 	Let’s say that we wanted to get the first two names alphabetically that are
+ 	Lets say that we wanted to get the first two names alphabetically that are
 	four characters long.
  		
  */
@@ -555,7 +555,7 @@ public class TheStreams {
 		countInt.forEach(System.out::println);
 		
 		//more simple
-		//The range() method indicates that we want the numbers 1–6, not including the number 6.
+		//The range() method indicates that we want the numbers 1 to 6, not including the number 6.
 		System.out.println("simple: ");
 		IntStream range = IntStream.range(1, 6);
 		range.forEach(System.out::println);
@@ -571,13 +571,13 @@ public class TheStreams {
 	|--------------------------------------------------------------------------------------------|
 	|Source			2_Stream			2_DoubleStream			2_IntStream			2_LongStream |
 	|--------------------------------------------------------------------------------------------|
-	|Stream			map					mapToDouble				mapToInt			mapToLong	 
+	|Stream			map					mapToDouble				mapToInt			mapToLong	 |	 
 	|
-	|DoubleStream	mapToObj			map						mapToInt			mapToLong
+	|DoubleStream	mapToObj			map						mapToInt			mapToLong	 |
 	|
-	|IntStream		mapToObj			mapToDouble				map					mapToLong
+	|IntStream		mapToObj			mapToDouble				map					mapToLong	 |
 	|
-	|LongStream		mapToObj			mapToDouble				mapToInt			map
+	|LongStream		mapToObj			mapToDouble				mapToInt			map			 |
 	|--------------------------------------------------------------------------------------------|
 	
 	Obviously, they have to be compatible types for this to work. Java requires a mapping
@@ -656,21 +656,21 @@ public class TheStreams {
 	|-----------------------------------------------------------------|
 	|				OptionalDouble		OptionalInt		OptionalLong  |
 	|-----------------------------------------------------------------|
-	|Getting		getAsDouble()		getAsInt()		getAsLong()	 
+	|Getting		getAsDouble()		getAsInt()		getAsLong()	  |
 	|
-	|orElseGet()	DoubleSupplier		IntSupplier		LongSupploer
+	|orElseGet()	DoubleSupplier		IntSupplier		LongSupploer  |
 	|
-	|max()			OptionalDouble		OptionalInt		OptionalLong
+	|max()			OptionalDouble		OptionalInt		OptionalLong  |
 	|
-	|sum()			double				int				long
+	|sum()			double				int				long		  |
 	|
-	|avg()			OptionalDouble		OptionalDouble	OptionalDouble
+	|avg()			OptionalDouble		OptionalDouble	OptionalDouble|
 	|-----------------------------------------------------------------|
 	
 	
 	Summarizing Statistics
 	----------------------
-	You’ve learned enough to be able to get the maximum value from a stream of int primitives.
+	You have learned enough to be able to get the maximum value from a stream of int primitives.
 	If the stream is empty, we want to throw an exception:
  */
 		IntStream ints = IntStream.empty();
@@ -712,8 +712,8 @@ public class TheStreams {
 				System.out.println(string);
 		}
 /**
- 	It works, but it contains nested if statements. That’s extra complexity. 
- 	Let’s try this again with functional programming:
+ 	It works, but it contains nested if statements. Thats extra complexity. 
+ 	Lets try this again with functional programming:
  */
 		optionalInteger
 			.map(n -> "" + n) 				// part 1
@@ -886,7 +886,7 @@ public class TheStreams {
 	the stream into lists, organizing them by the function provided. 
 	This makes the keys in the map the function value and the values the function results.
 	
-	Suppose that we don’t want a List as the value in the map and prefer a Set instead.
+	Suppose that we dont want a List as the value in the map and prefer a Set instead.
  */
 		ohMy = Stream.of("lions", "tigers", "bears");
 		
@@ -909,7 +909,7 @@ public class TheStreams {
  	Partitioning
  	------------
  	Partitioning is a special case of grouping. With partitioning, there are only two possible
-	groups—true and false. Partitioning is like splitting a list into two parts
+	groups: true and false. Partitioning is like splitting a list into two parts
  	
  */
 		ohMy = Stream.of("lions", "tigers", "bears");
@@ -930,7 +930,7 @@ public class TheStreams {
 	Finally, there is a mapping() collector that lets us go down a level and add another
 	collector. Suppose that we wanted to get the first letter of the first animal alphabetically of
 	each length. Why? Perhaps for random sampling. The examples on this part of the exam
-	are fairly contrived as well. We’d write the following:
+	are fairly contrived as well. We would write the following:
  */
 		ohMy = Stream.of("lions", "tigers", "bears");
 		
@@ -948,8 +948,8 @@ public class TheStreams {
  		
  		
  	-reducing() collector
- 	There is one more collector called reducing(). You don’t need to know it for the exam.
-	It is a general reduction in case all of the previous collectors don’t meet your needs.
+ 	There is one more collector called reducing(). You dont need to know it for the exam.
+	It is a general reduction in case all of the previous collectors dont meet your needs.
  */
 	}
 	
