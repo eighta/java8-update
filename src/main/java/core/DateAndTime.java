@@ -1,10 +1,17 @@
 package core;
 
+import static java.time.temporal.ChronoUnit.*;
+
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+
 
 public class DateAndTime {
 
@@ -80,32 +87,182 @@ public class DateAndTime {
 		ZoneId zone = ZoneId.systemDefault();
 		ZonedDateTime conference = ZonedDateTime.of(
 				year, month, dayOfMonth, hour, minute, second, nanoOfSecond, zone);
-		System.out.println(conference);
+		System.out.println("Specific ZonedDateTime: " + conference);
 		
 /**
 	Obtain
  */
-		System.out.println(LocalDate.now());
-		System.out.println(LocalTime.now());
-		System.out.println(LocalDateTime.now());
-		System.out.println(ZonedDateTime.now());
+		System.out.println("LocalDate.now(): " + LocalDate.now());
+		System.out.println("LocalTime.now(): " + LocalTime.now());
+		System.out.println("LocalDateTime.now(): " + LocalDateTime.now());
+		System.out.println("ZonedDateTime.now(): "  + ZonedDateTime.now());
 
 /**
 	The ZonedDateTime adds the time zone off-set and time zone. 
 	New York is four time zones away from Greenwich Mean Time (GMT).
-	Greenwich Mean Time is a time zone in Europe that is used as time zone zero when
-	discussing offsets. You might have also heard of Coordinated Universal Time, which is
-	a time zone standard. It is abbreviated as a UTC, as a compromise between the English
-	and French names. (Thatâ€™s not a typo. UTC isnâ€™t actually the proper acronym in either
-	language!) UTC uses the same time zone zero as GMT.
 	
-	PAGE 236
-
+	Greenwich Mean Time is a time zone in Europe that is used as time zone zero when
+	discussing offsets. 
+	
+	You might have also heard of Coordinated Universal Time, which is a time zone standard. 
+	It is abbreviated as a UTC, as a compromise between the English and French names. 
+	(Thats not a typo. UTC isnt actually the proper acronym in either language!) 
+	UTC uses the same time zone zero as GMT.
+	
+	UTC
+	2015–06–20T07:50+02:00[Europe/Paris]
+	2015–06–20T06:50+05:30[Asia/Kolkata]
+	
+	GMT
+	2015–06–20T07:50 GMT-04:00
+	2015–06–20T04:50 GMT-07:00
  */
 		
 /**
- 	Date Format
- 	In the United States, the month is written before the date.
+ 	US Date Format
+ 	In the United States, the month is written before the date (day).
+ */
+		//DATES
+		LocalDate date1 = LocalDate.of(2015, Month.JANUARY, 20);
+		LocalDate date2 = LocalDate.of(2015, 1, 20);
+		System.out.println(date1.equals(date2));
+		
+		//TIMES
+		LocalTime time1 = LocalTime.of(6, 15); // hour and minute
+		LocalTime time2 = LocalTime.of(6, 15, 30); // + seconds
+		LocalTime time3 = LocalTime.of(6, 15, 30, 200); // + nanoseconds
+		
+		//DATE-TIME
+		LocalDateTime dateTime1 = LocalDateTime.of(2015, Month.JANUARY, 20, 6, 15, 30,1);
+		LocalDateTime dateTime2 = LocalDateTime.of(date1, time1);
+		
+		//ZonedDateTime
+		ZoneId zoneId = ZoneId.of("US/Eastern");
+		
+		ZonedDateTime zoned1 = ZonedDateTime.of(2015, 1, 20,6, 15, 30, 200, zoneId);
+		ZonedDateTime zoned2 = ZonedDateTime.of(date2, time3, zoneId);
+		ZonedDateTime zoned3 = ZonedDateTime.of(dateTime2, zoneId);
+
+		ZoneId.getAvailableZoneIds().stream()
+			.sorted().forEach(System.out::println);
+		System.out.println(ZoneId.getAvailableZoneIds().size() );
+		
+/**
+	Manipulating Dates and Times
+	----------------------------
+ */
+		LocalTime time = LocalTime.now();
+		time.plusNanos(1);
+		time.plusSeconds(2);
+		time.plusMinutes(3);
+		time.plusHours(4);
+		
+		LocalDate date = LocalDate.of(2014, Month.JANUARY, 20);
+		date.plusDays(2);
+		date.plusWeeks(1);
+		date.plusMonths(1);
+		
+		//This would bring us to February 29, 2014. 
+		//However, 2014 is not a leap year. (2012 and 2016 are leap years.) 
+		//Java is smart enough to realize that February 29, 2014, does not exist, 
+		//and it gives us February 28, 2014, instead.
+		
+		date.plusYears(5);
+		
+		//from enum java.time.temporal.ChronoUnit
+		date.plus(3,DAYS);
+		
+		LocalDateTime dateTime = LocalDateTime.now();
+		dateTime.minusNanos(1);
+		dateTime.minusSeconds(2);
+		dateTime.minusMinutes(3);
+		dateTime.minusHours(4);
+		dateTime.minusDays(5);
+		dateTime.minusWeeks(6);
+		dateTime.minusMonths(7);
+		dateTime.minusYears(8);
+
+		
+//EPOCH 1970-01-01
+		LocalDate epochLocalDate = LocalDate.of(1970, Month.JANUARY, 10);
+		System.out.println(epochLocalDate.toEpochDay() );
+		
+		LocalDate beforeEpochLocalDate = LocalDate.of(1969, Month.DECEMBER, 31);
+		System.out.println(beforeEpochLocalDate.toEpochDay() );
+		
+/**
+	Working with Periods
+ */
+		Period.ofDays(1);
+		Period.ofWeeks(2);
+		Period.ofMonths(3);
+		Period.ofYears(4);
+		
+		int years = 1, months= 2, days=3;
+		Period periodYearMonthDay = Period.of(years, months, days);
+		
+		//El LocalTime no soporta sumar (operar) un period (ya que su minima unidad es un dia) 
+		//time.plus(Period.ofDays(1));
+		//java.time.temporal.UnsupportedTemporalTypeException: Unsupported unit: Days
+		
+		date.plus(periodYearMonthDay);
+		
+		System.out.println(Period.of(1, 2, 3));
+		System.out.println(Period.ofWeeks(2));
+		System.out.println(Period.of(1,13,33));
+		System.out.println(Period.ofWeeks(5));
+		
+		//java.time.temporal.UnsupportedTemporalTypeException: Unit must not have an estimated duration
+		//Duration.of(1, YEARS);
+		Duration.of(360, DAYS);
+		
+
+/**
+ 	Working with Durations
+ 	
+ 	Period is a day or more of time. There is also
+	Duration, which is intended for smaller units of time.
+	
+	For Duration, you can specify the number of 
+		days, hours, minutes, seconds, or nanoseconds.
+ */
+		
+		Duration daily = Duration.ofDays(1);
+		Duration hourly = Duration.ofHours(1);
+		Duration everyMinute = Duration.ofMinutes(1);
+		Duration everyTenSeconds = Duration.ofSeconds(10);
+		Duration everyMilli = Duration.ofMillis(1);
+		Duration everyNano = Duration.ofNanos(1);
+		
+		//from enum java.time.temporal.ChronoUnit
+		Duration.of(3, SECONDS);
+		
+		time.plus(everyMilli);
+		//date.plus(everyMilli);
+		//java.time.temporal.UnsupportedTemporalTypeException: Unsupported unit: Nanos
+		dateTime.plus(everyMilli);
+		System.out.println(everyTenSeconds);
+		
+/**
+ 	ChronoUnit for Differences
+ 	
+ 	ChronoUnit is a great way to determine how far apart two Temporal values are. 
+ 	Temporal includes LocalDate, LocalTime, and so on.
+ */
+		
+		LocalTime one = LocalTime.of(5, 15);
+		LocalTime two = LocalTime.of(6, 30);
+		LocalDate odate = LocalDate.of(2016, 1, 20);
+		System.out.println(ChronoUnit.HOURS.between(one, two)); 
+		System.out.println(ChronoUnit.MINUTES.between(one, two)); 
+		
+		//java.time.DateTimeException
+		//System.out.println(ChronoUnit.MINUTES.between(one, odate));
+		
+/**
+ 	Working with Instants
+ 	
+ 	PAGE 250
  */
 		
 	}
