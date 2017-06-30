@@ -3,6 +3,7 @@ package core;
 import static java.time.temporal.ChronoUnit.*;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -264,14 +265,63 @@ public class DateAndTime {
  	
  	The Instant class represents a specific moment in time in the GMT time zone.
  */
+		Instant now = Instant.now();
+		System.out.println(now);
 		
+		// do something time consuming
+		//MiscClass.factorial(18_000);
+		
+		Instant later = Instant.now();
+		
+		Duration duration = Duration.between(now, later);
+		System.out.println(duration);
+		
+		//If you have a ZonedDateTime, you can turn it into an Instant:
+		LocalDate idate = LocalDate.of(2015, 5, 25);
+		LocalTime itime = LocalTime.now();
+		ZoneId izone = ZoneId.of("America/Bogota");
+		ZonedDateTime izonedDateTime = ZonedDateTime.of(idate, itime, izone);
+		Instant instant = izonedDateTime.toInstant(); // 2015–05–25T15:55:00Z
+		System.out.println(izonedDateTime);
+		System.out.println(instant);
+		
+		//
+		Instant instant1 = Instant.ofEpochSecond(0);
+		System.out.println(instant1);
+		
+		instant.plus(1, NANOS);
+		instant.plus(1, MILLIS);
+		instant.plus(1, SECONDS);
+		instant.plus(1, MINUTES);
+		instant.plus(1, HOURS);
+		Instant nextDay = instant.plus(1, DAYS);
+		//instant.plus(1,WEEKS);	Exception
+		//instant.plus(1,MONTHS);	Exception
+		
+		System.out.println(nextDay);
+		
+/**
+	Accounting for Daylight Savings Time
+	
+	Some countries observe daylight savings time. This is where the clocks are adjusted by an
+	hour twice a year to make better use of the sunlight. Not all countries participate, and
+	those that do use different weekends for the change.
+	In the United States, we move the clocks an hour ahead in March and move them an
+	hour back in November.
+ */
+		
+		LocalDate ddate = LocalDate.of(2016, Month.MARCH, 13);
+		LocalTime dtime = LocalTime.of(1, 30);
+		ZoneId dzone = ZoneId.of("US/Eastern");
+		ZonedDateTime ddateTime = ZonedDateTime.of(ddate, dtime, dzone);
+		System.out.println(ddateTime);
+		ddateTime = ddateTime.plusHours(1);
+		System.out.println(ddateTime);
 		
 		
 	}
 	
 	public static void main(String[] args) {
 		new DateAndTime();
-		
-		System.out.println("¡done!");
 	}
 }
