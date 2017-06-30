@@ -52,7 +52,7 @@ public class Java8News {
 	public static void main(String[] args) {
 		new Java8News();
 		
-		System.out.println("¡done!");
+		System.out.println("¡already done!");
 	}
 	
 	
