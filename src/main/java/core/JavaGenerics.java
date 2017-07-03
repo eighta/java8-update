@@ -137,6 +137,7 @@ public class JavaGenerics {
 	//-3: The final way is to not use generics at all
 	//This is the old way of writing code. It generates a compiler warning 
 	//about Shippable being a raw type, but it does compile.
+	@SuppressWarnings("rawtypes")
 	public class ShippableCrate implements Shippable {
 		public void ship(Object t) { }
 	}
@@ -151,7 +152,10 @@ public class JavaGenerics {
 	
 	//Generic Class with two generic parameters
 	public class SizeLimitedCrate<T, U> {
-		private T contents; private U sizeLimit;
+		@SuppressWarnings("unused")
+		private T contents; 
+		@SuppressWarnings("unused")
+		private U sizeLimit;
 		public SizeLimitedCrate(T contents, U sizeLimit) {
 			this.contents = contents;
 			this.sizeLimit = sizeLimit;
@@ -204,6 +208,7 @@ public class JavaGenerics {
 		crate.packCrate("TheString");
 		
 		//java < 5
+		@SuppressWarnings("rawtypes")
 		List namesOldList = new ArrayList();
 		
 		//java 5
@@ -216,6 +221,14 @@ public class JavaGenerics {
 		 */
 		List<String> namesListWithDiamond = new ArrayList<>();
 		
+		//NOT USED
+		String.valueOf(listUpperBounded);
+		String.valueOf(listUpperBoundedLong);
+		String.valueOf(objectsList);
+		String.valueOf(objects);
+		String.valueOf(namesOldList);
+		String.valueOf(namesListWithGenerics);
+		String.valueOf(namesListWithDiamond);
 	}
 	
 	public static void main(String[] args) {
@@ -235,6 +248,7 @@ class GenericClass<T>{
 		this.tInstance = tInstance;
 	}
 	
+	@SuppressWarnings("hiding")
 	public <T> T methodInstanceGeneric(T tLocal){
 		return tLocal;
 	} 

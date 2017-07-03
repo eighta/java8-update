@@ -70,6 +70,7 @@ public class DateAndTime {
 	LocalDateTime is "the stroke of midnight on New Year’s Eve."
  */
 		LocalDateTime stroke = LocalDateTime.of(birthday, midnight);
+		System.out.println(stroke);
 		
 /**
 	-ZonedDateTime
@@ -330,7 +331,17 @@ public class DateAndTime {
 		ddateTime = ddateTime.plusMinutes(1);
 		System.out.println(ddateTime);
 		
-		
+		//NOT USED
+		time2.toString();
+		dateTime1.toString();
+		zoned1.toString();
+		zoned2.toString();
+		zoned3.toString();
+		daily.toString();
+		hourly.toString();
+		everyMinute.toString();
+		everyNano.toString();
+		odate.toString();
 	}
 	
 	public static void main(String[] args) {

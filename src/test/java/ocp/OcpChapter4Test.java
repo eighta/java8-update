@@ -96,6 +96,16 @@ public class OcpChapter4Test {
 		Stream<String> s1 = Stream.iterate("", w -> w + "1" );
 		System.out.println(s1.limit(2).map( x -> x + "2"  ));
 		
+		//NOT USED
+		String.valueOf(fromIntStream2StringStream);
+		String.valueOf(booleanSupplier);
+		String.valueOf(unaryOperator);
+		String.valueOf(f);
+		String.valueOf(bf);
+		String.valueOf(ds);
+		String.valueOf(sup);
+		String.valueOf(opt);
+		String.valueOf(p1);
 	}
 	
 	public static void main(String[] args) {

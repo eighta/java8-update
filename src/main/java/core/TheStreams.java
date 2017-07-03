@@ -951,9 +951,19 @@ public class TheStreams {
  	There is one more collector called reducing(). You dont need to know it for the exam.
 	It is a general reduction in case all of the previous collectors dont meet your needs.
  */
+		
+		//NOT USED
+		String.valueOf(randomDouble);
+		String.valueOf(fractionsDouble);
+		String.valueOf(intStream);
+		String.valueOf(optional);
+		String.valueOf(resultAnotherOptional);
+		String.valueOf(resultAnotherOptionalOptional);
+		String.valueOf(flatResult);
+		
 	}
 	
-	private static List<String> create() throws IOException {throw new IOException();}
+	public static List<String> create() throws IOException {throw new IOException();}
 	
 	public static Optional<Integer> calculateOptional (String source){
 		return Optional.ofNullable(source).map(s -> s.length()); }

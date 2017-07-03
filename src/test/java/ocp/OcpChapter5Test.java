@@ -47,6 +47,7 @@ public class OcpChapter5Test {
 		LocalDateTime dateTime = LocalDateTime.of(2015, 5, 10, 11, 22, 33);
 		Period p = Period.of(1, 2, 3);
 		
+		@SuppressWarnings("static-access")
 		Period p2k = Period.ofDays(1).ofYears(2);
 		System.out.println(p2k);
 		
@@ -167,6 +168,13 @@ public class OcpChapter5Test {
 		//XXX OJO EL metodo "get" solito no viene enversion sobrecargarga
 		//En cambio el getProperty si
 		
+		//NOT USED
+		String.valueOf(date1);
+		String.valueOf(dateTime);
+		String.valueOf(p);
+		String.valueOf(t16);
+		String.valueOf(d16);
+		String.valueOf(a_rv5);
 	}
 	
 	

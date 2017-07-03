@@ -24,12 +24,12 @@ public class OcpChapter3Test {
 		}
 		
 		{
-		//	t.toString();
+			String.valueOf(t);
 		}
 		
 	}
 	
-	private static  void otroMetodoEstatico(){
+	public static  void otroMetodoEstatico(){
 		//System.out.println(u.getMessage());
 	}
 	
@@ -140,6 +140,15 @@ public class OcpChapter3Test {
 		int a = UnaInterface.AMOUNT;
 		*/
 		
+		//NOT USED
+		String.valueOf(list);
+		String.valueOf(list2);
+		String.valueOf(list3);
+		String.valueOf(treeSet);
+		String.valueOf(list11);
+		String.valueOf(super1);
+		String.valueOf(extends1);
+		
 	}
 	
 }
@@ -160,7 +169,7 @@ interface Max extends InterfaceUno, InterfaceTwo{
 
 interface UnaInterface{
 	int AMOUNT = 10;
-	static void staticMethod(){int a = AMOUNT+1; /*AMOUNT = 2;*/}
+	static void staticMethod(){int a = AMOUNT+1; String.valueOf(a);}
 }
 
 abstract class ClaseAbstracta{}

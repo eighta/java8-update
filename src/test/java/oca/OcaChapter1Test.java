@@ -12,6 +12,9 @@ public class OcaChapter1Test {
 		double d16 = 0xE;
 		System.out.println(i16);
 		System.out.println(d16);
+		
+		//NOT USED
+		String.valueOf(d15);
 	}
 	
 	public static void main(String[] args) {

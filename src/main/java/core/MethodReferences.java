@@ -74,6 +74,17 @@ public class MethodReferences {
 //		redundancy and simply write this:
 		Comparator<Duck> byWeightMethodRef = DuckHelper::compareByWeight;
 		
+		//NOT USED
+		String.valueOf(methodRefConstructor);
+		String.valueOf(lambdaMethodRefConstructor);
+		String.valueOf(methodRefInstanceUnknownInstance);
+		String.valueOf(lambdaMethodRefInstanceUnknownInstance);
+		String.valueOf(methodRefInstance);
+		String.valueOf(lambdaMethodRefInstance);
+		String.valueOf(methodRefStatic);
+		String.valueOf(lambdaMethodRefStatic);
+		String.valueOf(byWeight);
+		String.valueOf(byWeightMethodRef);
 	}
 	
 	public static void main(String[] args) {

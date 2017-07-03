@@ -1,7 +1,5 @@
 package ocp;
 
-import static  java.util.Collections.*;
-
 public class OcpChapter1Test {
 
 	
@@ -30,6 +28,12 @@ public class OcpChapter1Test {
 				return OcpChapter1Test.this.pageNumber;
 			}
 			
+			{
+				//NOT USED
+				String.valueOf(x);
+				
+			}
+			
 		}
 		
 		 InnerLocal  innerLocal = new  InnerLocal();
@@ -41,6 +45,11 @@ public class OcpChapter1Test {
 	private int num1;
 	private static class StaticMemberInnerClass{
 		private int num1 = 1;
+		
+		{
+			//NOT USED
+			String.valueOf(num1);
+		}
 		
 	}
 	private class InstanceMemberInnerClass{
@@ -58,6 +67,8 @@ public class OcpChapter1Test {
 		System.out.println(s3 == s3_2);
 		System.out.println( s3.equals(s3_2) );
 		
+		//NOT USED
+		String.valueOf(cadena);
 	}
 	
 	public boolean equals(OcpChapter1Test a){
@@ -85,6 +96,13 @@ public class OcpChapter1Test {
 		
 		OcpChapter1Test.StaticMemberInnerClass staticInner = new OcpChapter1Test.StaticMemberInnerClass();
 		StaticMemberInnerClass staticInner2 = new OcpChapter1Test.StaticMemberInnerClass();
+		
+		String.valueOf(i12);
+		String.valueOf(i134);
+		String.valueOf(anotherChild);
+		String.valueOf(staticInner);
+		String.valueOf(staticInner2);
+						
 		
 	}
 	

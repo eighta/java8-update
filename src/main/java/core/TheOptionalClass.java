@@ -71,6 +71,10 @@ public class TheOptionalClass {
 		
 		System.out.println(Double.NaN);
 		
+		//NOT USED
+		String.valueOf(o2);
+		String.valueOf(optionalExceptionSupplier);
+		
 	}
 	
 	public static void main(String[] args) {

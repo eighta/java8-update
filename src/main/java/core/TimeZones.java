@@ -28,7 +28,12 @@ public class TimeZones {
 		System.out.println(TimeZone.getAvailableIDs().length);
 		
 		//depreciado
+		@SuppressWarnings("deprecation")
 		Date jan = new Date(2015, Calendar.JANUARY, 1);
+		
+		//NOT USED
+		String.valueOf(timeZoneDefault);
+		String.valueOf(jan);
 	}
 	
 	

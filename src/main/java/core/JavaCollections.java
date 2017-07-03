@@ -52,7 +52,7 @@ import java.util.function.Function;
  	java.util.Arrays$ArrayList
  		-representacion de un Arreglo en forma de List
  		-esta implementacion posee las mismas caracteristicas que un arreglo
- 			Una ves definido el tamaño inicial del arreglo, esta no puede cambiar 
+ 			Una ves definido el tamaÃ±o inicial del arreglo, esta no puede cambiar 
  			de igual forma esta caracteristica se conserva en este ArrayList
  			y al intentar adicionar o remover items lanza un:
  			UnsupportedOperationException
@@ -110,8 +110,8 @@ import java.util.function.Function;
 	
 	*ArrayDeque is a "pure" double-ended queue. It was introduced in Java 6, and it
 	stores its elements in a resizable array.
-	Deque (interface) is supposed to be pronounced “deck,” but many people,
-	including the authors, say it wrong as “d-queue.”
+	Deque (interface) is supposed to be pronounced â€œdeck,â€� but many people,
+	including the authors, say it wrong as â€œd-queue.â€�
  	
  	[[Methods]]
  	E element()
@@ -157,7 +157,7 @@ import java.util.function.Function;
 	The main benefit is that the keys are always in sorted order.
 	
 	*Hashtable
-	is like Vector in that it is really old and thread-safe and that you won’t be
+	is like Vector in that it is really old and thread-safe and that you wonâ€™t be
 	expected to use it.
  	
  	[[Methods]]
@@ -215,7 +215,7 @@ public class JavaCollections {
 		System.out.println(favorites);
 		
 		favorites.put("Tom", null);
-		//There’s another method, called putIfAbsent() , that you can call if you want to set a
+		//Thereâ€™s another method, called putIfAbsent() , that you can call if you want to set a
 		//value in the map, but this method skips it if the value is already set to a non- null value:
 		favorites.putIfAbsent("Jenny", "Tram");
 		favorites.putIfAbsent("Sam", "Tram");
@@ -247,7 +247,7 @@ public class JavaCollections {
 		System.out.println(sam); // null
 		
 		//computeIfAbsent
-		//the functional interface runs only when the key isn’t present or is null
+		//the functional interface runs only when the key isnâ€™t present or is null
 		Map<String, Integer> counts2 = new HashMap<>();
 		counts2.put("Jenny", 15);
 		counts2.put("Tom", null);
@@ -292,7 +292,7 @@ public class JavaCollections {
 	 	 ARRAY:		[		1,		6,		8,		9]
 	 	  
 	 	 La logica es: se intenta buscar el valor 3, pero este no es encontrado por eso retorna un valor negativo
-	 	 y el valor -2 resulta de lo siguiente, el valor a buscar 3, segun el arreglo debió haber estado despues de 1,
+	 	 y el valor -2 resulta de lo siguiente, el valor a buscar 3, segun el arreglo debiÃ³ haber estado despues de 1,
 	 	 y el 1 se encuentra en en el index 0, entonces se supone que el 3 debio estar en el index 1, como no es encontrado
 	 	 pasa a ser -1 pero, finalmente a este -1 se le resta -1 para finalmente resultando -2
 	 	 */
@@ -300,7 +300,11 @@ public class JavaCollections {
 	 	Collections.sort(list4search);
 	 	System.out.println(Collections.binarySearch(list4search, 3)); // 0
 
-	 	
+	 	//NOT USED
+	 	String.valueOf(jenny2);
+	 	String.valueOf(sam2);
+	 	String.valueOf(tom2);
+	 	String.valueOf(array2);
 		
 	}
 	
