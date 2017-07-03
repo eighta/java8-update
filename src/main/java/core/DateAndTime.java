@@ -151,6 +151,9 @@ public class DateAndTime {
 /**
 	Manipulating Dates and Times
 	----------------------------
+	
+	XXX OJO ESTE TIPO DE OBJETOS SON INMUTABLES, POR ENDE DEVUELVEN EL RESULTADO OPERADO
+	PERO ELLOS NO CAMBIAN SU CONTENIDO
  */
 		LocalTime time = LocalTime.now();
 		time.plusNanos(1);
@@ -297,6 +300,7 @@ public class DateAndTime {
 		Instant nextDay = instant.plus(1, DAYS);
 		//instant.plus(1,WEEKS);	Exception
 		//instant.plus(1,MONTHS);	Exception
+		//instant.plus(1,YEARS);	Exception
 		
 		System.out.println(nextDay);
 		
@@ -308,14 +312,22 @@ public class DateAndTime {
 	those that do use different weekends for the change.
 	In the United States, we move the clocks an hour ahead in March and move them an
 	hour back in November.
+	
+	Excatamente:
+	-El dia Marzo 13 	a las 2AM el reloj salta a las 3AM
+	-El dia Noviembre 6 a las 2AM el reloj se devuelve a la 1AM (reptiendo dos veces esa hora)
+	
+	 En ambos casos, la zona horaria se ve afectada
+	
  */
 		
 		LocalDate ddate = LocalDate.of(2016, Month.MARCH, 13);
-		LocalTime dtime = LocalTime.of(1, 30);
+		LocalTime dtime = LocalTime.of(1, 59);
 		ZoneId dzone = ZoneId.of("US/Eastern");
 		ZonedDateTime ddateTime = ZonedDateTime.of(ddate, dtime, dzone);
 		System.out.println(ddateTime);
-		ddateTime = ddateTime.plusHours(1);
+		//ddateTime = ddateTime.plusHours(1);
+		ddateTime = ddateTime.plusMinutes(1);
 		System.out.println(ddateTime);
 		
 		

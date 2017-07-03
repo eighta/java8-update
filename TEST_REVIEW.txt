@@ -1,4 +1,29 @@
 #############
+OCP Chapter 5
+#############
+	answer			result
+1	A,B				OK
+2	C,D,E			OK
+3	C,D				OK
+4	B				OK
+5	D				OK
+6	D,F				OK
+7	D				OK
+8	F				OK
+9	B				OK		HEAVY
+10	E				OK
+11	B 				OK		HEAVY
+12	A,E				OK
+13	D				FAIL	VERY HEAVY
+14	A,C,D,E			FAIL	LOOK options BETTER
+15	B,C				OK		VERY HEAVY
+16	A,B,F			OK		VERY HEAVY
+17	A				FAIL	HEAVY
+18	D				OK		HEAVY
+19	A,B,C			OK
+20	A,E				FAIL	HARD
+
+#############
 OCP Chapter 4
 #############
 
