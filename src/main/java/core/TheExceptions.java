@@ -1,5 +1,11 @@
 package core;
 
+import java.beans.IntrospectionException;
+import java.io.InvalidClassException;
+import java.sql.SQLException;
+import java.util.ConcurrentModificationException;
+import java.util.NoSuchElementException;
+
 public class TheExceptions {
 
 	{
@@ -53,11 +59,115 @@ public class TheExceptions {
 	
 	Try Statement
 	-------------
-	
-	
-	PAGE 288
  */
+		try{
+			
+			boolean hmm = true;
+			
+			if(hmm) throw new ArrayIndexOutOfBoundsException("array desbordamiento");
+			
+			//UNCHECKED EXCEPTIONS
+			//Son aquellas que extienden de RuntimeException o Error
+			if(hmm) throw new Error("error y tales");
+			
+			//if(hmm) throw new Exception("Toma lo tuyo");
+			
+			//RUNTIME EXCEPTIONS
+			//if(hmm) throw new RuntimeException("Toma lo tuyo");
+			
+			//WHAT THE FUCK ARE THIS?
+			if(hmm) throw new CustomThrowable("Toma lo tuyo");
+			
+			System.out.println("pailas no llega");
+		
+		//ONE CATCH IS MANDATORY if not finally
+		} catch (NoSuchElementException c) {
+			c.printStackTrace();
+			
+		//RUNTIME EXPCETIONS
+		} catch (ArrayIndexOutOfBoundsException | ClassCastException m) {
+			
+			System.out.println("Multiple catch");
+			m.printStackTrace();
+			
+			
+		} catch (Error e) {
+			System.out.println("Error catch");
+			e.printStackTrace();
+			
+			
+		} catch (Throwable t) {
+			System.out.println("Throwable catch");
+			t.printStackTrace();
+			
+		//ONLY ONE ADMITED
+		}finally{
+			System.out.println("finally");
+		}
+		
+		
+		try{
+			
+			boolean hmm = false;
+			if (hmm) throw new IntrospectionException("Introspection");
+			
+		}catch(IntrospectionException i){
+			
+		}
+		
+		
+		try{
+			
+		}catch(Exception e){
+			
+		}
+
+/**
+	Try-With-Resources Basics
+	-------------------------
+	PAGE 298
+	
+ */
+		
+		
+		//try-with-resources statements
+		//This feature is also known as automatic resource management
+		AutoCloseable auto = () -> {};
+		
+		try(
+			CustomAutoCloseable customAuto1 = new CustomAutoCloseable();
+			CustomAutoCloseable customAuto2 = new CustomAutoCloseable()
+			
+			){
+			
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
+	public void getDataFromDatabase() throws SQLException {
+		
+		//throw new UnsupportedOperationException();
+		boolean hmm = false;
+		if (hmm) throw new ArrayIndexOutOfBoundsException();
+	}
+	
+	public static void main(String[] args) {
+		new TheExceptions();
+	}
+	
+}
+
+class CustomAutoCloseable implements AutoCloseable{
+	@Override
+	public void close() throws Exception {
+		System.out.println("CustomAutoCloseable.close()");
+	}
+}
+class CustomThrowable extends Throwable{
+	private static final long serialVersionUID = -7738508243873726788L;
+	public CustomThrowable(String msg) {super(msg);}
 }
