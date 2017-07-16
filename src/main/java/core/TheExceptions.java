@@ -12,8 +12,8 @@ public class TheExceptions {
 /**
 	Exceptions Terminology
 	----------------------
-	An exception is Java’s way of saying, “I give up. I don’t know what to do right now. You
-	deal with it.”
+	An exception is Javaï¿½s way of saying, ï¿½I give up. I donï¿½t know what to do right now. You
+	deal with it.ï¿½
 	
 	Categories of Exceptions
 	------------------------
@@ -50,7 +50,7 @@ public class TheExceptions {
 	
 	NumberFormatException
 	Thrown by the program when an attempt is made to convert
-	a string to a numeric type, but the string doesn’t have an appropriate format.
+	a string to a numeric type, but the string doesnï¿½t have an appropriate format.
 	
 	CheckedExceptions
 	java.io.IOException is an example of a checked exception.
@@ -132,7 +132,13 @@ public class TheExceptions {
 		
 		//try-with-resources statements
 		//This feature is also known as automatic resource management
-		AutoCloseable auto = () -> {};
+		try {
+			AutoCloseable auto = () -> {};
+			auto.close();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		
 		
 		try(
 			CustomAutoCloseable customAuto1 = new CustomAutoCloseable();
