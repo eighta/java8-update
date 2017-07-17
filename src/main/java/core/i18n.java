@@ -23,8 +23,8 @@ public class i18n {
 	involves placing strings in a property file and using classes like DateFormat so that the right
 	format is used based on user preferences.
 
-	Localization means actually supporting multiple locales. Oracle defines a locale as “a
-	specific geographical, political, or cultural region.”
+	Localization means actually supporting multiple locales. Oracle defines a locale as ï¿½a
+	specific geographical, political, or cultural region.ï¿½
 	You can think of a locale as being like a language and country pairing
 	
 	Since internationalization and localization are such long words, 
@@ -43,7 +43,7 @@ public class i18n {
 		System.out.println(new Locale("hi", "IN"));
 		
 /**
- 	There’s another way to create a Locale that is more fl exible. The builder design pattern lets
+ 	There is another way to create a Locale that is more flexible. The builder design pattern lets
 	you set all of the properties that you care about and then build it at the end. This means that
 	you can specify the properties in any order.
  */
@@ -111,7 +111,7 @@ public class i18n {
 /**
 	Creating a Java Class Resource Bundle
 	-------------------------------------
-	Most of the time, a property file resource bundle is enough to meet the program’s needs. It
+	Most of the time, a property file resource bundle is enough to meet the programï¿½s needs. It
 	does have a limitation in that only String values are allowed. Java class resource bundles
 	allow any Java type as the value. Keys are strings regardless.
 	
@@ -158,7 +158,7 @@ public class i18n {
 	------------------------------------------
 	In real programs, it is common to substitute variables in the middle of a resource bundle
 	string. The convention is to use a number inside brackets such as {0}. Although Java
-	resource bundles don’t support this directly, the MessageFormat class does.
+	resource bundles donï¿½t support this directly, the MessageFormat class does.
 	
 	For example, suppose that we had this property defined:
 		helloByName=Hello, {0}
@@ -177,7 +177,7 @@ public class i18n {
 /**
 	Formatting Numbers
 	------------------
-	Resource bundles are great for content that doesn’t change. Text like a welcome greeting is
+	Resource bundles are great for content that doesnï¿½t change. Text like a welcome greeting is
 	pretty stable. When talking about dates and prices, the formatting varies and not just the
 	text. Luckily, the java.text package has classes to save the day. The following sections
 	cover how to format numbers, currency, and dates.
@@ -281,7 +281,7 @@ public class i18n {
 		System.out.println(shortF.format(dateTime));
 		System.out.println(mediumF.format(dateTime));
 		
-		//If you don’t want to use one of the predefined formats, you can create your own. 
+		//If you donï¿½t want to use one of the predefined formats, you can create your own. 
 		//For example, this code spells out the month:
 		System.out.println("custom");
 		DateTimeFormatter f = DateTimeFormatter.ofPattern("MMMM dd, yyyy, hh:mm").withLocale(Locale.FRANCE);

@@ -186,6 +186,11 @@ public class JavaGenerics {
 		List<? extends Number> listUpperBoundedLong = new ArrayList<Long>();
 		
 		//Problema en asignacion de coleciones genericas
+		
+		List<Number> listNumber_ListNumber  = new ArrayList<Number>();
+		listNumber_ListNumber.add(new Integer(1));
+		
+		
 		List<Integer> numbersList = new ArrayList<>();
 		numbersList.add(new Integer(42));
 		 //error de compilacion: no es posible realizar dicha asignacion 
@@ -239,6 +244,12 @@ public class JavaGenerics {
 		System.out.println( genericClass.methodInstanceGeneric("Nada") );
 		System.out.println( genericClass.methodInstance());
 	}
+	
+	{
+		List<Animal> animales = new ArrayList<>();
+		animales.add(new Perro() );
+		
+	}
 }
 
 class GenericClass<T>{
@@ -256,4 +267,6 @@ class GenericClass<T>{
 	public T methodInstance(){return tInstance;}
 }
 
+abstract class Animal{}
+class Perro extends Animal{}
 
