@@ -1,7 +1,9 @@
 package core;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -205,7 +207,50 @@ import java.util.function.Function;
 
 public class JavaCollections {
 
+	public static void basic(){
+		
+		//Local class
+		class StringComparator implements Comparator<String>{
+			@Override
+			public int compare(String o1, String o2) {
+				return 0;
+			}
+		}
+		
+		//Lists
+		List<Number> numbersList = new ArrayList<>();
+		
+		//abstract class REFERENCE
+		Number integerNumber = new Integer(1);
+		numbersList.add(integerNumber);
+		
+		Number doubleNumber = new Double(1.2);
+		numbersList.add(doubleNumber);
+		
+		//concrete class REFERENCE
+		Integer integer = new Integer(3);
+		numbersList.add(integer);
+		
+		//--MAPS
+		Map<String,Number> numbersMap = new HashMap<>();
+		numbersMap.put("integerNumber", integerNumber);
+		numbersMap.put("doubleNumber", doubleNumber);
+		numbersMap.put("integer", integer);
+		
+		//MAPS-Generics
+		Map<String,Comparator<?>> comparatorsMap = new HashMap<>();
+		
+		Comparator<String> stringComparator = new StringComparator();
+		comparatorsMap.put("stringComparator", stringComparator);
+		
+	}
+	
+	
+	
 	public static void main(String[] args) {
+		
+		basic();
+		if (true) return;
 		
 		//New Java 8 Map API
 		Map<String, String> favorites = new HashMap<>();
@@ -215,7 +260,7 @@ public class JavaCollections {
 		System.out.println(favorites);
 		
 		favorites.put("Tom", null);
-		//Thereâ€™s another method, called putIfAbsent() , that you can call if you want to set a
+		//There is another method, called putIfAbsent() , that you can call if you want to set a
 		//value in the map, but this method skips it if the value is already set to a non- null value:
 		favorites.putIfAbsent("Jenny", "Tram");
 		favorites.putIfAbsent("Sam", "Tram");
