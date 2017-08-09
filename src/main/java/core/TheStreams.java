@@ -224,8 +224,8 @@ public class TheStreams {
 	
 /**
  	-reduce()
- 	The reduce() method combines a stream into a single object. As you can tell from the
-		name, it is a reduction. 
+ 	The reduce() method combines a stream into a single object. 
+ 	As you can tell from the name, it is a reduction. 
 		
 	The method signatures are these:
 		T 			reduce(T identity, BinaryOperator<T> accumulator)
