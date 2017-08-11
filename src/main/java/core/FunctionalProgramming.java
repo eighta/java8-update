@@ -27,12 +27,12 @@ package core;
  * the lambda expression. This allows you to write multiple lines of code in the body of the
  * lambda expression, as you might do when working with an if statement or while loop.
  * 
- * Whatâ€™s tricky here is that when you add braces {}, you must explicitly terminate each
+ * What's tricky here is that when you add braces {}, you must explicitly terminate each
  * statement in the body with a semicolon;
  * 
- * we were able to omit the braces {}, semiâ€�colon;, and return statement,
- * because this is a special shortcut that Java allows for singleâ€�line lambda bodies.
- * This special shortcut doesnâ€™t work when you have two or more statements.
+ * we were able to omit the braces {}, semicolon;, and return statement,
+ * because this is a special shortcut that Java allows for single line lambda bodies.
+ * This special shortcut doesn't work when you have two or more statements.
  * 
  * When using {} in the body of the lambda expression, 
  * you must use the return statement if the functional interface method
