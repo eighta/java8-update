@@ -1,0 +1,4 @@
+Crear un proyecto en GITHUB 
+
+http://www.singhajit.com/filter-design-pattern/
+https://www.tutorialspoint.com/design_pattern/filter_pattern.htm
