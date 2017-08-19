@@ -952,6 +952,10 @@ public class TheStreams {
 	It is a general reduction in case all of the previous collectors dont meet your needs.
  */
 		
+/**
+ http://www.adam-bien.com/roller/abien/entry/java_8_flatmap_example		
+ */
+		
 		//NOT USED
 		String.valueOf(randomDouble);
 		String.valueOf(fractionsDouble);
