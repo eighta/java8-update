@@ -2,3 +2,6 @@ Crear un proyecto en GITHUB
 
 http://www.singhajit.com/filter-design-pattern/
 https://www.tutorialspoint.com/design_pattern/filter_pattern.htm
+
+Writing Clean Predicates with Java 8 
+https://dzone.com/articles/writing-clean-predicates-java
