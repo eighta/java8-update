@@ -1,0 +1,27 @@
+What is "ext" on a PS4 controller?
+
+The “Ext” port on the Dualshock 4 is for charging the controller, just like the USB port on the front. “Ext” port is used like this:
+
+image
+
+extra periphals plug in there, certain headsets or a little keyboard (FALSE)
+
+
+
+http://www.pushsquare.com/news/2013/03/five_things_you_may_not_know_about_the_ps4s_controller
+
+
+
+
+http://www.psdevwiki.com/ps4/DualShock_4
+http://www.psdevwiki.com/ps4/DS4-BT
+http://www.psdevwiki.com/ps4/DS4-USB
+
+
+https://community.playstation.com/content/pdc/us/en_US/pdc-communities/support/Consoles-Peripherals.topic.html/headphone_mic_jackp-cBDP.html
+
+https://www.forbes.com/sites/jasonevangelho/2014/10/16/nykos-ps4-modular-charging-station-looks-like-the-cure-for-your-ailing-dualshock-4-controllers/#2195bc807535
+
+https://www.cnet.com/products/sony-dualshock-4-urban-camouflage/specs/
+
+https://hyper-db.de/monopedia/wiki/index.php?title=DualShock#DualShock_4
