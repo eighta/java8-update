@@ -1,10 +1,8 @@
 package core;
 
 import java.beans.IntrospectionException;
-import java.io.InvalidClassException;
 import java.sql.SQLException;
 import java.time.format.DateTimeParseException;
-import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 
 public class TheExceptions {
@@ -13,19 +11,19 @@ public class TheExceptions {
 /**
 	Exceptions Terminology
 	----------------------
-	An exception is Javaï¿½s way of saying, ï¿½I give up. I donï¿½t know what to do right now. You
-	deal with it.ï¿½
+	An exception is Java's way of saying, I give up. I don't know what to do right now. 
+	You deal with it.
 	
 	Categories of Exceptions
 	------------------------
-	Remember that a runtime exception, or unchecked
-	exception, may be caught, but it is not required that it be caught.
+	>>>Remember that a runtime exception, or unchecked exception, 
+	may be caught, but it is not required that it be caught.
 	
-	A checked exception is any class that extends Exception but is not a runtime
-	exception. Checked exceptions must follow the handle or declare rule where they are either
+	>>>A checked exception is any class that extends Exception but is not a runtime exception. 
+	Checked exceptions must follow the handle or declare rule where they are either
 	caught or thrown to the caller. 
 	
-	An error is fatal and should not be caught by the program.
+	>>>An error is fatal and should not be caught by the program.
 	While it is legal to catch an error, it is not a good practice.
 	
 	java.lang.Object < Throwable < Error
@@ -51,9 +49,9 @@ public class TheExceptions {
 	
 	NumberFormatException
 	Thrown by the program when an attempt is made to convert
-	a string to a numeric type, but the string doesnï¿½t have an appropriate format.
+	a string to a numeric type, but the string doesn't have an appropriate format.
 	
-	CheckedExceptions
+	[[[CheckedExceptions]]]
 	java.io.IOException is an example of a checked exception.
 	remember that IO, parsing, and SQL exceptions are checked.
 	
@@ -91,11 +89,9 @@ public class TheExceptions {
 			System.out.println("Multiple catch");
 			m.printStackTrace();
 			
-			
 		} catch (Error e) {
 			System.out.println("Error catch");
 			e.printStackTrace();
-			
 			
 		} catch (Throwable t) {
 			System.out.println("Throwable catch");
@@ -134,8 +130,6 @@ try {}finally {}
 	A traditional try statement must have either or both.
 	
  */
-		
-		
 		//try-with-resources statements
 		//This feature is also known as automatic resource management
 		try {
@@ -145,9 +139,10 @@ try {}finally {}
 			e1.printStackTrace();
 		}
 /**
-Notice that one or more resources can be opened in the try clause. 
-Also, notice that parentheses are used to list those resources and semicolons are used to separate the declarations. 
-This works just like declaring multiple indexes in a for loop.
+	Notice that one or more resources can be opened in the try clause. 
+	Also, notice that parentheses are used to list those resources 
+	and semicolons are used to separate the declarations. 
+	This works just like declaring multiple indexes in a for loop.
  */
 		
 		try(
@@ -191,7 +186,7 @@ es decir, la excepcion es swallow (es tragada la exception)
 4. Si una expcetion es lanzada por uno de los recursos AutoClosable, aun es valido tener bloque 'catch'
 para intentar atrapar dicha exception
  
-5. OJO que ocurre un evento extraño, y es, si se lanza una exception en el bloque de ejecucion normal 
+5. OJO que ocurre un evento extraNo, y es, si se lanza una exception en el bloque de ejecucion normal 
 (es decir entre el try y el catch) lo que ocurre a continuacion es lo siguiente:
  -a. el 'Try-With-Resources' al identificar la exception, lo que primero realiza es cerrar los 
   	Auto-Closable (que tambien pueden lanzar exceptions a su vez)
@@ -202,7 +197,8 @@ para intentar atrapar dicha exception
  
 6. Se evidencia, que el funcionamiento del 'Try-With-Resources' es encolado.
 Teniendo en cuenta que, al instanciar los objetos AutoClosable dentro del bloque try(...),
-tambien, durante la instanciacion pueden lanzar exceptions, se concluye el siguiente comportamiento:
+durante suinstanciacion tambien pueden lanzar exceptions.
+Al suceder esto, el comportamiento es el siguiente:
 
 Durante la ejecucion de un 'Try-With-Resources' sucede:
 
@@ -210,22 +206,21 @@ Durante la ejecucion de un 'Try-With-Resources' sucede:
 
  -b. Si al instanciar uno de estos objetos Autoclosable se lanza una exception, se detiene la ejecucion
 del bloque try(...), pero se mantiene la cola de los recursos que alcanzaron a instanciarse en dicho bloque
-(obviamente, no se alcanza ejuctar el bloque "normal" que esta entre el try-catch
+(evidentemente, no se alcanza ejecutar el bloque "normal" que esta entre el try-catch)
 
  -c. Se (auto) cierran los objetos que alcanzaron a instanciarse dentro del bloque try(...) 
-(de forma inversa, es decir, el ultimo que alcanzó a ser instanciado, es el primero en intentar cerrarse )
+(de forma inversa, es decir, el ultimo que alcanzÃ³ a ser instanciado, es el primero en intentar cerrarse)
 
  -d. Luego se ejecuta el bloque del catch, que atrapa la exception lanzada (si existe uno)
 
  -e. Para finalmente ejecutar el bloque finally
   
- DEFINCION: swallow, by swallow me refiero a Suppressed Exceptions, que se habla mas adelante 
- 
+ DEFINCION: swallow, by swallow me refiero a Suppressed Exceptions, que se habla mas adelante  
  */
 
 /**
 The resources created in the try clause are only in scope within the try block. 
-(es decir, no lo ven los catch ni el ultimo finally) 
+(es decir, no lo ven los catch ni el finally) 
  */
 		
 /**
@@ -252,7 +247,7 @@ The resources created in the try clause are only in scope within the try block.
 		
 /**
  OJO: hay una parte curiosa con el override del Autoclosable,
- si uno override el metodo close(), y le quita la exception en la declaracion del metodo (en el override)
+ si al sobreescrbir el metodo close(), y le quita la exception en la declaracion del metodo (en el override)
  no es necesario definir ningun bloque catch en el 'Try-With-Resources',
  pero, si deja en la firma que se lanza una Exception, entonces, si se REQUIERE que exista
  un bloque catch, que atrape dicha Exception, osea java.lang.Exception OBLIGADO  
@@ -279,7 +274,6 @@ The language designers emphasize backward compatibility. Since changing the exis
 interface was undesirable, they made a new one called AutoCloseable. This new
 interface is less strict than Closeable. Since Closeable meets the requirements for
 AutoCloseable, it started implementing AutoCloseable when the latter was introduced.
-  
  */
 		
 /**
@@ -300,11 +294,8 @@ Runtime exceptions do not need to be acknowledged.
 
 What happens if the try block also throws an exception?
 Java 7 added a way to accumulate exceptions. 
-When multiple exceptions are thrown, all but
-the first are called suppressed exceptions.
-(La primera actuara de forma natural (primary exception), 
-	las demas serán "suppressed exceptions")
-
+When multiple exceptions are thrown, all but the first are called suppressed exceptions.
+(La primera actuara de forma natural (primary exception),  las demas serÃ¡n "suppressed exceptions")
  */
 		
 		System.out.println("Suppressed Exceptions");
@@ -336,24 +327,21 @@ The following example does not throw a suppressed exception:
 					CustomAutoCloseable customAuto2 = new CustomAutoCloseable(2,true);
 					
 			){
-				new Custom2RuntimeException("Otra tipica exception");
+				throw new Custom2RuntimeException("Otra tipica exception");
 				
 			}finally {
 				if (true) throw new RuntimeException("Enviada desde el finally");
 /*
-Since this block throws an exception, 
-the previous exception is lost. 
+Since the finally block throws an exception, the previous exception is lost. 
 				
 This has always been and continues to be bad programming practice. 
-We don’t want to lose exceptions.
+We don't want to lose exceptions.
 
 Remember that Java needs to be backward compatible. try and finally were both
 allowed to throw an exception long before Java 7. When this happened, the finally block
 took precedence. This behavior needs to continue.
-
 */				
-			}
-			
+			}			
 			
 		}catch(Exception e) {
 			System.out.println("MASTER BLOCK Exception");
@@ -364,7 +352,7 @@ took precedence. This behavior needs to continue.
 		}
 
 /**
-You’ve learned two new rules for the order in which code runs in 
+You've learned two new rules for the order in which code runs in 
 a try-with-resources statement:
 	-Resources are closed after the try clause ends and before any catch/finally clauses.
 	-Resources are closed in the reverse order from which they were created.		
@@ -395,15 +383,15 @@ logic. Or we could use multi-catch:
 		}
 		
 /**
-This doesn’t seem bad. We only have one catch block on line 6, so we aren’t duplicating
-code. Or are we? The list of exceptions in the catch block and the list of exceptions in the
+This doesn't seem bad. We only have one catch block, so we aren't duplicating code. Or are we? 
+The list of exceptions in the catch block and the list of exceptions in the
 method signature of multiCatch() are the same. This is duplication.
 Since there were a number of changes in Java 7, the language designers decided to solve
 this problem at the same time. They made it legal to write Exception in the catch block but
 really only a limited set of exceptions.	
 
 These changes are why many people prefer using unchecked exceptions.
-You don’t have this trickle of changes when a method changes which
+You don't have this trickle of changes when a method changes which
 exceptions it throws.
  */
 		
@@ -412,18 +400,19 @@ exceptions it throws.
 Working with Assertions
 -----------------------
 An assertion is a Boolean expression that you place at a point in your code where you
-expect something to be true. The English defi nition of the word assert is to state that
+expect something to be true. The English definition of the word assert is to state that
 something is true, which means that you assert that something is true. An assert statement
 contains this statement along with an optional String message.
 
 An assertion allows for detecting defects in the code. You can turn on assertions for testing
 and debugging while leaving them off when your program is in production.
+
 Why assert something when you know it is true? It is only true when everything is
 working properly. If the program has a defect, it might not actually be true. Detecting this
 earlier in the process lets you know something is wrong.
 
 When troubleshooting a problem at work, developers might tell people
-that they don’t believe anything that they can’t see. Often the process of
+that they don't believe anything that they can't see. Often the process of
 verifying something they have verbally asserted to be true proves the
 assumption was false.
 
@@ -443,14 +432,9 @@ The assert Statement
 The boolean expression must evaluate to true or false . It can be inside optional parenthesis.
 The optional error message is a String used as the message for the AssertionError that is thrown.
 
-That’s right. An assertion throws an AssertionError if it is false. Since programs aren’t
+That's right. An assertion throws an AssertionError if it is false. Since programs aren't
 supposed to catch an Error , this means that assertion failures are fatal and end the program.		
- */
-		
-		
-/**
-An assertion throws an AssertionError if it is false. Since programs aren’t
-supposed to catch an Error , this means that assertion failures are fatal and end the program.
+
 The three possible outcomes of an assert statement are as follows:
 -If assertions are disabled, Java skips the assertion and goes on in the code.
 -If assertions are enabled and the boolean expression is true , then our assertion has
@@ -461,7 +445,7 @@ invalid and a java.lang.AssertionError is thrown.
  */
 		
 /**
- FOR ENABLE ASSERTIONS:$> java –ea MainClass
+ FOR ENABLE ASSERTIONS:$> java -ea MainClass
  
  eclipse
  -------
