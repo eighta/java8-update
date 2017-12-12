@@ -22,3 +22,41 @@ ActRaiser 2?
 U.N. Squadrom
 harvest moon
 nba tournament edition
+
+Hardware
+========
+Allwinner R16 SoC
+
+Software
+========
+FEL boot
+-armbian
+-linux-sunxi
+
+FEL is a low-level subroutine contained in the BootROM on "Allwinner" devices.
+It is used for initial programming and recovery of devices using USB.
+
+Your device therefore needs to be attached to a host (your PC) by means of a USB cable,
+connected to a port where the "sunxi" device will present itself as a USB 'slave' (i.e. in device mode).
+Usually that means the "OTG" connector.
+
+Entering FEL mode
+=================
+While there are a few different ways to trigger FEL mode, they are not always equal.
+Some do low-level initialization (load Boot0 and Boot1), and some don't
+
+If you are going to use FEL mode to retrieve device information, you need a to pick a method of entering FEL mode 
+that initializes Boot1.
+
+Power off your device
+=====================
+Before you try to enter FEL mode, make sure that your device is "truly powered off". Do not leave any cables attached.
+Due to a common design flaw, (current leaking from) the "UART" will often keep the device in a slightly working state.
+So before you power up your device again: diconnect your UART, and re-attach it. 
+
+FEL Protocol
+============
+The FEL is actually a tiny usb stack implementing a special USB protocol.
+Part of it is impl 
+
+U-boot
