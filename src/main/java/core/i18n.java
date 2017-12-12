@@ -23,8 +23,8 @@ public class i18n {
 	involves placing strings in a property file and using classes like DateFormat so that the right
 	format is used based on user preferences.
 
-	Localization means actually supporting multiple locales. Oracle defines a locale as �a
-	specific geographical, political, or cultural region.�
+	Localization means actually supporting multiple locales. 
+	Oracle defines a locale as a specific geographical, political, or cultural region.
 	You can think of a locale as being like a language and country pairing
 	
 	Since internationalization and localization are such long words, 
@@ -43,9 +43,9 @@ public class i18n {
 		System.out.println(new Locale("hi", "IN"));
 		
 /**
- 	There is another way to create a Locale that is more flexible. The builder design pattern lets
-	you set all of the properties that you care about and then build it at the end. This means that
-	you can specify the properties in any order.
+ 	There is another way to create a Locale that is more flexible. 
+ 	The builder design pattern lets you set all of the properties that you care about 
+ 	and then build it at the end. This means that you can specify the properties in any order.
  */
 		Locale l1 = new Locale.Builder()
 				.setLanguage("en")
@@ -70,10 +70,8 @@ public class i18n {
 	Using a Resource Bundle
 	-----------------------
 	A resource bundle contains the local specific objects to be used by a program. 
-	It is like a map with keys and values. 
-	
-	The resource bundle can be in a property fi le or in a Java class.
-	
+	It is like a map with keys and values. 	
+	The resource bundle can be in a property file or in a Java class.
 	A property file is a file in a specific format with key/value pairs.
  */
 	
@@ -111,9 +109,9 @@ public class i18n {
 /**
 	Creating a Java Class Resource Bundle
 	-------------------------------------
-	Most of the time, a property file resource bundle is enough to meet the program�s needs. It
-	does have a limitation in that only String values are allowed. Java class resource bundles
-	allow any Java type as the value. Keys are strings regardless.
+	Most of the time, a property file resource bundle is enough to meet the program's needs. 
+	It does have a limitation in that only String values are allowed. 
+	Java class resource bundles allow any Java type as the value. Keys are strings regardless.
 	
 	To implement a resource bundle in Java, you create a class with the same name that you
 	would use for a property file.
@@ -158,7 +156,7 @@ public class i18n {
 	------------------------------------------
 	In real programs, it is common to substitute variables in the middle of a resource bundle
 	string. The convention is to use a number inside brackets such as {0}. Although Java
-	resource bundles don�t support this directly, the MessageFormat class does.
+	resource bundles don't support this directly, the MessageFormat class does.
 	
 	For example, suppose that we had this property defined:
 		helloByName=Hello, {0}
@@ -170,17 +168,18 @@ public class i18n {
 		ResourceBundle rsPlain = ResourceBundle.getBundle("plain");
 		System.out.println(rsPlain.getString("helloByName"));
 
-		String _2format = rsPlain.getString("helloByName");
-		String formatted = MessageFormat.format(_2format, "Tammy");
+		String rs2format = rsPlain.getString("helloByName");
+		String formatted = MessageFormat.format(rs2format, "Tammy");
 		System.out.println(formatted);
 
 /**
 	Formatting Numbers
 	------------------
-	Resource bundles are great for content that doesn�t change. Text like a welcome greeting is
-	pretty stable. When talking about dates and prices, the formatting varies and not just the
-	text. Luckily, the java.text package has classes to save the day. The following sections
-	cover how to format numbers, currency, and dates.
+	Resource bundles are great for content that doesn't change. 
+	Text like a welcome greeting is pretty stable. 
+	When talking about dates and prices, the formatting varies and not just the text. 
+	Luckily, the java.text package has classes to save the day. 
+	The following sections cover how to format numbers, currency, and dates.
  */
 		
 		//Factory methods to get a NumberFormat
@@ -216,8 +215,8 @@ public class i18n {
 		System.out.println(NumberFormat.getInstance(Locale.CANADA_FRENCH).format(attendeesPerMonth));
 		
 /**
-	In the United States, we use commas to separate
-	parts of large numbers. Germans use a dot for this function. French Canadians use neither.
+	In the United States, we use commas to separate parts of large numbers. 
+	Germans use a dot for this function. French Canadians use neither.
  */
 		//Format (NUMBER -> TEXT)
 		double price = 48;
@@ -233,9 +232,9 @@ public class i18n {
 /**
  	Formatting Dates and Times
  	--------------------------
- 	Java provides a class called DateTimeFormatter to help us
-	out. Unlike the LocalDateTime class, DateTimeFormatter can be used to format any type of
-	date and/or time object. What changes is the format.
+ 	Java provides a class called DateTimeFormatter to help us out. 
+ 	Unlike the LocalDateTime class, DateTimeFormatter can be used to format any type of date and/or time object. 
+ 	What changes is the format.
  */
 		LocalDate date = LocalDate.of(2020, Month.JANUARY, 20);
 		System.out.println(date.getDayOfWeek()); // MONDAY
@@ -252,9 +251,9 @@ public class i18n {
 		System.out.println(dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 		
 		//there are some predefined formats that are more useful:
-		DateTimeFormatter shortDateTime = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-		System.out.println(shortDateTime.format(dateTime)); // 1/20/20
-		System.out.println(shortDateTime.format(date)); // 1/20/20
+		DateTimeFormatter shortDateTimeFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+		System.out.println(shortDateTimeFormatter.format(dateTime)); // 1/20/20
+		System.out.println(shortDateTimeFormatter.format(date)); // 1/20/20
 		//throws an exception because a time cannot be formatted as a date.
 		//System.out.println(shortDateTime.format(time));
 		
@@ -276,24 +275,24 @@ public class i18n {
 		System.out.println(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(new Locale("hi")).format(dateTime));
 		
 		//predefined formats SHORT and MEDIUM
-		DateTimeFormatter shortF = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
-		DateTimeFormatter mediumF = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
-		System.out.println(shortF.format(dateTime));
-		System.out.println(mediumF.format(dateTime));
+		DateTimeFormatter shortFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+		DateTimeFormatter mediumFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+		System.out.println(shortFormatter.format(dateTime));
+		System.out.println(mediumFormatter.format(dateTime));
 		
-		//If you don�t want to use one of the predefined formats, you can create your own. 
+		//If you don't want to use one of the predefined formats, you can create your own. 
 		//For example, this code spells out the month:
-		System.out.println("custom");
-		DateTimeFormatter f = DateTimeFormatter.ofPattern("MMMM dd, yyyy, hh:mm").withLocale(Locale.FRANCE);
-		System.out.println(dateTime.format(f)); // January 20, 2020, 11:12
+		System.out.println("Custom Formatter");
+		DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy, hh:mm").withLocale(Locale.FRANCE);
+		System.out.println(dateTime.format(customFormatter)); // January 20, 2020, 11:12
 		
 		//Parsing a Date
-		DateTimeFormatter dateFormatParse = DateTimeFormatter.ofPattern("MM dd yyyy");
-		LocalDate localDateParser = LocalDate.parse("01 02 2015", dateFormatParse);
-		System.out.println(localDateParser);
+		DateTimeFormatter dateFormat4Parse = DateTimeFormatter.ofPattern("MM dd yyyy");
+		LocalDate localDateParsed = LocalDate.parse("01 02 2015", dateFormat4Parse);
+		System.out.println(localDateParsed);
 		//using default formmater
-		LocalTime localTimeParser = LocalTime.parse("11:22");
-		System.out.println(localTimeParser);
+		LocalTime localTimeParsed = LocalTime.parse("11:22");
+		System.out.println(localTimeParsed);
 		
 		
 	}
