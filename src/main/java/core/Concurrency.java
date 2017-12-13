@@ -1,7 +1,10 @@
 package core;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class Concurrency {
 
@@ -281,8 +284,225 @@ The ExecutorService interface also includes overloaded versions of invokeAll() a
 invokeAny() that take a timeout value and TimeUnit parameter.
  */
 		
+/**
+Waiting for Results
+-------------------
+How do we know when a task submitted to an ExecutorService is complete? As men-
+tioned in the last section, the submit() method returns a java.util.concurrent.
+Future<V> object, or Future<V> for short, that can be used to determine this result:
 		
+Future<?> future = service.submit(() -> System.out.println("Hello Zoo"));
+
+The Future class includes methods that are useful in determining the state of a task:
+
+-boolean isDone()
+Returns true if the task was completed, threw an exception, or was cancelled.
+
+-boolean isCancelled()
+Returns true if the task was cancelled before it completely­ normally.
+
+-boolean cancel()
+Attempts to cancel execution of the task.
+
+-V get()
+Retrieves the result of a task, waiting endlessly if it is not yet available.
+
+-V get(long timeout,TimeUnit unit)
+Retrieves the result of a task, waiting the specified amount of time. 
+If the result is not ready by the time the timeout is reached, 
+a checked TimeoutException will be thrown.
+
+What is the return value of this task? 
+As Future<V> is a generic class, the type V is determined by the return type of the Runnable method. 
+Since the return type of Runnable.run() is void , the get() method always returns null.
+
+The get() method can take an optional value and enum type java.util.concurrent.TimeUnit.
+
+-TimeUnit.NANOSECONDS
+Time in one-billionth of a second (1/1,000,000,000)
+
+-TimeUnit.MICROSECONDS
+Time in one-millionth of a second (1/1,000,000)
+
+-TimeUnit.MILLISECONDS
+Time in one-thousandth of a second (1/1,000)
+
+-TimeUnit.SECONDS
+Time in seconds
+
+-TimeUnit.MINUTES
+Time in minutes
+
+-TimeUnit.HOURS
+Time in hours
+
+-TimeUnit.DAYS
+Time in days
+ */
 		
+/**
+Introducing Callable
+--------------------
+When the Concurrency API was released in Java 5, the new java.util.concurrent.
+Callable interface was added, or Callable for short, which is similar to Runnable except
+that its call() method returns a value and can throw a checked exception. As you may
+remember from the definition of Runnable , the run() method returns void and cannot
+throw any checked exceptions. Along with Runnable , Callable was also made a functional
+interface in Java 8
+
+@FunctionalInterface 
+public interface Callable<V> {
+	V call() throws Exception;
+}
+
+The Callable interface was introduced as an alternative to the Runnable interface,
+since it allows more details to be retrieved easily from the task after it is completed. The
+ExecutorService includes an overloaded version of the submit() method that takes a
+Callable object and returns a generic Future<T> object.		
+ */
+		
+/**
+Ambiguous Lambda Expressions: Callable vs. Supplier
+
+You may remember from Chapter 4 that the Callable functional interface strongly
+resembles the Supplier functional interface, in that they both take no arguments and
+return a generic type. One difference is that the method in Callable can throw a checked
+Exception . How do you tell lambda expressions for these two apart? The answer is
+sometimes you can't. PAG 342 example
+ */
+
+		service = Executors.newSingleThreadExecutor();
+		Future<Integer> result = service.submit(() -> 30+11);
+		try {
+			Integer integerResult = result.get();
+			System.out.println("GET RESULT: " + integerResult);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}finally {
+			service.shutdown();
+		}
+
+/**
+Checked Exceptions in Callable and Runnable
+-------------------------------------------
+Besides having a return type, the Callable interface also supports checked exceptions,
+whereas the Runnable interface does not without an embedded try/catch block. Given
+an instance of ExecutorService called service , which of the following lines of code will
+or will not compile?
+
+service.submit(() -> {Thread.sleep(1000); return null;});
+service.submit(() -> {Thread.sleep(1000);});
+
+The first line will compile, while the second line will not. Why? Recall that Thread.
+sleep() throws a checked InterruptedException . Since the first lambda expression
+has a return type, the compiler treats this as a Callable expression that supports
+checked exceptions. The second lambda expression does not return a value; therefore,
+the compiler treats this as a Runnable expression. Since Runnable methods do not sup-
+port checked exceptions, the compiler will report an error trying to compile this code
+snippet.
+ */
+		
+/**
+Waiting for All Tasks to Finish
+-------------------------------
+After submitting a set of tasks to a thread executor, it is common to wait for the results.
+As you saw in the previous sections, one solution is to call get() on each Future object
+returned by the submit() method. If we don’t need the results of the tasks and are finished
+using our thread executor, there is a simpler approach.
+
+First, we shut down the thread executor using the shutdown() method. 
+Next, we use the awaitTermination(long timeout, TimeUnit unit) method available for all thread executors.
+The method waits the specified time to complete all tasks, returning sooner if all
+tasks finish or an InterruptedException is detected.
+
+<CODE>
+ExecutorService service = Executors.newSingleThreadExecutor();
+// Add tasks to the thread executor
+service.shutdown();
+service.awaitTermination(1, TimeUnit.MINUTES);
+if(service.isTerminated())
+	System.out.println("All tasks finished");
+else
+	System.out.println("At least one task is still running");
+ */
+		
+/**
+Scheduling Tasks
+----------------
+Oftentimes in Java, we need to schedule a task to happen at some future time.
+We might even need to schedule the task to happen repeatedly, at some set interval.
+
+The ScheduledExecutorService , which is a subinterface of ExecutorService, 
+can be used for just such a task.
+	
+Like ExecutorService , we obtain an instance of ScheduledExecutorService using a
+factory method in the Executors class
+ */
+	ScheduledExecutorService scheduledService = Executors.newSingleThreadScheduledExecutor();
+	scheduledService.shutdown();
+	
+/**
+ScheduledExecutorService Methods
+--------------------------------
+-schedule(Callable<V> callable, long delay, TimeUnit unit)
+Creates and executes a Callable task after the given delay
+
+-schedule(Runnable command, long delay, TimeUnit unit)
+Creates and executes a Runnable task after the given delay
+
+-scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit)
+Creates and executes a Runnable task after the given
+initial delay, creating a new task every period value that passes.
+
+-scheduleAtFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit)
+Creates and executes a Runnable task after the given
+initial delay and subsequently with the given delay
+between the termination of one execution and the commencement of the next
+
+The first two schedule() methods take a Callable or Runnable, respectively, 
+perform the task after some delay, and return a ScheduledFuture<V> instance. 
+ScheduledFuture<V> is identical to the Future<V> class, 
+except that it includes a getDelay() method that returns the delay set when the process was created.
+
+While these tasks are scheduled in the future, the actual execution may
+be delayed. For example, there may be no threads available to perform
+the task, at which point they will just wait in the queue. Also, if the
+ScheduledExecutorService is shut down by the time the scheduled task
+execution time is reached, they will be discarded.
+
+The last two methods might be a little confusing if you have not seen them before. 
+Conceptually, they are very similar as they both perform the same task repeatedly,
+after completing some initial delay. The difference is related to the timing of the process and
+when the next task starts.
+
+The scheduleAtFixedRate() method creates a new task and submits it to the executor
+every period, regardless of whether or not the previous task fi nished. The following exam-
+ple executes a Runnable task every minute, following an initial fi ve-minute delay:
+
+service.scheduleAtFixedRate(command,5,1,TimeUnit.MINUTE);
+
+One risk of using this method is the possibility a task could consistently take lon-
+ger to run than the period between tasks. What would happen if the task consis-
+tently took fi ve minutes to execute? Despite the fact that the task is still running, the
+ScheduledExecutorService would submit a new task to be started every minute. If a
+single-thread executor was used, over time this would result in endless set tasks being
+scheduled, which would run back to back assuming that no other tasks were submitted to
+the ScheduledExecutorService .
+On the other hand, the scheduleAtFixedDelay() method creates a new task after the
+previous task has fi nished. For example, if the fi rst task runs at 12:00 and takes fi ve min-
+utes to fi nish, with a period of 2 minutes, then the second task will start at 12:07.
+
+service.scheduleAtFixedDelay(command,0,2,TimeUnit.MINUTE);
+
+Notice that neither of the methods, scheduleAtFixedDelay() and
+scheduleAtFixedRate() , take a Callable object as an input parameter.
+Since these tasks are scheduled to run infinitely, as long as the
+ScheduledExecutorService is still alive, they would generate an endless
+series of Future objects.
+
+Each of the ScheduledExecutorService methods is important and has real-world applications.... PAG 347
+
+*/
 		
 	}
 	public static void main(String[] args) {
