@@ -223,6 +223,16 @@ The resources created in the try clause are only in scope within the try block.
 (es decir, no lo ven los catch ni el finally) 
  */
 		
+/**		
+	Unlike traditional try statements, try-with-resources does not require
+	a catch or finally block to be present.
+*/
+		
+		try(CustomAutoCloseable customAuto0 = new CustomAutoCloseable(0,true);){
+			System.out.println("Try-with-resources without catch or finally block");
+		}
+		
+		
 /**
  AutoCloseable
  This interface requires a close() method to be implemented
@@ -316,7 +326,7 @@ When multiple exceptions are thrown, all but the first are called suppressed exc
 		}
 /**
 Finally, keep in mind that suppressed exceptions 
-apply only to exceptions thrown in the try clause.
+apply only to exceptions thrown in the try-with-resource clause.
 
 The following example does not throw a suppressed exception:
  */
@@ -331,15 +341,15 @@ The following example does not throw a suppressed exception:
 				
 			}finally {
 				if (true) throw new RuntimeException("Enviada desde el finally");
-/*
+/*IMPORTANT:
 Since the finally block throws an exception, the previous exception is lost. 
 				
 This has always been and continues to be bad programming practice. 
 We don't want to lose exceptions.
 
 Remember that Java needs to be backward compatible. try and finally were both
-allowed to throw an exception long before Java 7. When this happened, the finally block
-took precedence. This behavior needs to continue.
+allowed to throw an exception long before Java 7. 
+When this happened, the finally block took precedence. This behavior needs to continue.
 */				
 			}			
 			
@@ -370,6 +380,10 @@ When calling this method, we need to handle or declare those two exception types
 There are few valid ways of doing this. We could have two catch blocks and duplicate the
 logic. Or we could use multi-catch:
 
+NOTE: The multiple exception types are not allowed to have a subclass/superclass relationship
+
+The variable in a multi-catch expression is effectively final.
+
  */
 		
 		try {
@@ -378,7 +392,7 @@ logic. Or we could use multi-catch:
 				throw e;
 			}
 		
-		}catch (SQLException | DateTimeParseException e) {
+		}catch (SQLException | DateTimeParseException | SubCustom1RuntimeException  e) {
 			System.out.println("SE CAPTURA EXCEPTION: " + e);
 		}
 		
@@ -445,6 +459,8 @@ invalid and a java.lang.AssertionError is thrown.
  */
 		
 /**
+-ea and -enable-assertion
+
  FOR ENABLE ASSERTIONS:$> java -ea MainClass
  
  eclipse
@@ -477,8 +493,61 @@ invalid and a java.lang.AssertionError is thrown.
 		if (hmm) throw new ArrayIndexOutOfBoundsException();
 	}
 	
-	public static void main(String[] args) {
-		new TheExceptions();
+	public static void main(String[] args) throws CheckedException {
+		//0
+		//new TheExceptions();
+		
+		//1
+//		try{
+//			TheExceptions.throwExceptionCatchAndFinally();
+//		}catch(Exception e){
+//			System.out.println("Exception identificada");
+//			e.printStackTrace();
+//			Throwable[] suppressed = e.getSuppressed();
+//			Thread.sleep(500);
+//			System.out.println("suppressed: " + suppressed.length);
+//		}
+		
+		//2
+		//TheExceptions.rethrowExceptionInTryWithResources();
+		
+		//3
+		//if(args.length <= 3) assert true;
+		
+		//4
+		try {
+			TheExceptions.throwCheckedException();
+		} catch (CheckedException | RuntimeException e) {
+//Un parametro tipo MULTI-CATCH no admite asignacion			
+//e = new SubCheckedException("SubCheckedException CAMBIADA");
+			throw e;
+		}
+		
+		
+		System.out.println("TheExceptions END!");
+	}
+
+	private static void throwCheckedException() throws CheckedException {
+		throw new CheckedException("CheckedException LANZADA");
+		
+	}
+
+	//Aunque el try-with-resource tiene un recurso en donde el metodo close lanaza una checked exception,
+//se define en el metodo que se lanza dicha excepction (por lo tanto no es necesario definir el catch block)	
+	private static void rethrowExceptionInTryWithResources() throws Exception{
+		try(AutoCloseableCheckedExceptionAtClose auto = new AutoCloseableCheckedExceptionAtClose()){ }
+	}
+
+//If both catch and finally throw an exception, the one from finally gets thrown.
+	@SuppressWarnings("finally")
+	private static void throwExceptionCatchAndFinally() {
+		try{
+			throw new RuntimeException("Lanzada en el try");
+		}catch(Exception e){
+			throw new RuntimeException("Lanzada en el catch");
+		}finally{
+			throw new RuntimeException("Lanzada en el finally");
+		}
 	}
 	
 }
@@ -496,6 +565,10 @@ class AutoCloseableCheckedExceptionAtClose implements AutoCloseable{
 class CheckedException extends Exception{
 	private static final long serialVersionUID = 2432254758585394061L;
 	public CheckedException(String msg) {super(msg);}
+}
+class SubCheckedException extends CheckedException{
+	private static final long serialVersionUID = 2432254758585394062L;
+	public SubCheckedException(String msg) {super(msg);}
 }
 
 class CustomAutoCloseable implements AutoCloseable{
@@ -538,4 +611,8 @@ class Custom2RuntimeException extends RuntimeException{
 class Custom1RuntimeException extends RuntimeException{
 	private static final long serialVersionUID = -7724388878955079702L;
 	public Custom1RuntimeException(String msg) {super(msg);}
+} 
+class SubCustom1RuntimeException extends Custom1RuntimeException{
+	private static final long serialVersionUID = -7724388878955079702L;
+	public SubCustom1RuntimeException(String msg) {super(msg);}
 } 

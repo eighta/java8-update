@@ -1,4 +1,30 @@
 #############
+OCP Chapter 6
+#############
+	answer			result
+1	C				OK
+2	A,B,C,			FAIL	SOSO
+3	E 				OK		HARD
+4	A,B 			OK		SOSO
+5	D				FAIL	HARD
+6	G				OK
+7	C 				OK		TRICKY	
+8	B				FAIL	VERY HEAVY
+9	A,D				OK		HARD
+10	A,E				OK
+11	B,D				FAIL	DateTimeParseException
+12	A,D,E			OK		VERY HEAVY
+13	A				OK		VERY HEAVY TOO
+14	F				OK		HARD
+15	B,E				OK		
+16	C 				OK		SOSO
+17	A				FAIL	Closable extends AutoClosable
+18	DONTKNOW		FAIL	VERY HEAVY
+19	B				FAIL	VERY HEAVY
+20	E				OK
+
+
+#############
 OCP Chapter 5
 #############
 	answer			result
