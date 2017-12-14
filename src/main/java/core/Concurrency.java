@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 
 public class Concurrency {
 
@@ -500,10 +501,205 @@ Since these tasks are scheduled to run infinitely, as long as the
 ScheduledExecutorService is still alive, they would generate an endless
 series of Future objects.
 
-Each of the ScheduledExecutorService methods is important and has real-world applications.... PAG 347
+Each of the ScheduledExecutorService methods is important and has real-world applications.
+For example, you can use the schedule() command to check on the state of processing a task and
+send out notifications if it is not finished or even call schedule() again to delay processing.
+
+The scheduleAtFixedRate() is useful for tasks that need to be run at specific intervals,
+such as checking the health of the animals once a day. Even if it takes two hours to examine
+an animal on Monday, this doesn’t mean that Tuesday’s exam should start any later.
+
+Finally, scheduleAtFixedDelay() is useful for processes that you want to happen
+repeatedly but whose specific time is unimportant. For example, imagine that we have a zoo
+cafeteria worker who periodically restocks the salad bar throughout the day. The process can
+take 20 minutes or more, since it requires the worker to haul a large number of items from the
+back room. Once the worker has filled the salad bar with fresh food, he doesn’t need to check
+at some specific time, just after enough time has passed for it to become low on stock again.
+*/
+	
+/**
+Increasing Concurrency with Pools
+---------------------------------
+Now present three additional factory methods in the Executors class that act on a
+pool of threads, rather than on a single thread.
+
+A thread pool is a group of pre-instantiated reusable threads that are available to perform a set of arbitrary tasks.
+
+[[Executors methods]]
+
+-newSingleThreadExecutor():ExecutorService
+Creates a single-threaded executor that uses a single worker thread operating off an unbounded queue. 
+Results are processed sequentially in the order in which they are submitted.
+
+-newSingleThreadScheduledExecutor():ScheduledExecutorService
+Creates a single-threaded executor that can schedule commands to run after a given delay 
+or to execute periodically.
+
+-newCachedThreadPool():ExecutorService
+Creates a thread pool that creates new threads as needed, 
+but will reuse previously constructed threads when they are available.
+
+-newFixedThreadPool(int nThreads):ExecutorService
+Creates a thread pool that reuses a fixed number of threads operating off a shared unbounded queue.
+
+-newScheduledThreadPool(int nThreads):ScheduledExecutorService
+Creates a thread pool that can schedule commands to run after a given delay or to execute periodically.
+
+ */
+	Executors.newSingleThreadExecutor();
+	Executors.newSingleThreadScheduledExecutor();
+	Executors.newCachedThreadPool();
+	Executors.newFixedThreadPool(5);
+	Executors.newScheduledThreadPool(5);
+//There are also overloaded versions of each of the methods 
+//that create threads using a ThreadFactory input parameter.
+	ThreadFactory threadFactory = Executors.defaultThreadFactory();
+	Executors.newSingleThreadExecutor(threadFactory);
+	Executors.newSingleThreadScheduledExecutor(threadFactory);
+	//...
+/**
+The difference between a single-thread and a pooled-thread executor is what happens
+when a task is already running. While a single-thread executor will wait for an available
+thread to become available before running the next task, a pooled-thread executor can
+execute the next task concurrently.
+
+If the pool runs out of available threads, the task will be queued by the thread executor and wait to be completed.
+ */
+	
+/**
+The newCachedThreadPool() method will create a thread pool of unbounded size,
+allocating a new thread anytime one is required or all existing threads are busy. 
+This is commonly used for pools that require executing many short-lived asynchronous tasks. 
+For long-lived processes, usage of this executor is strongly discouraged, as it could grow to
+encompass a large number of threads over the application life cycle.	
+ */
+	
+/**
+The newFixedThreadPool() takes a number of threads and allocates them all upon creation. 
+As long as our number of tasks is less than our number of threads, all tasks will be executed concurrently. 
+If at any point the number of tasks exceeds the number of threads in the pool, 
+they will wait in similar manner as you saw with a single-thread executor. 
+
+In fact, calling newFixedThreadPool() with a value of 1 is equivalent to calling newSingleThreadExecutor().	
+ */
+
+/**
+The newScheduledThreadPool() is identical to the newFixedThreadPool() method,
+except that it returns an instance of ScheduledExecutorService and is therefore
+compatible with scheduling tasks. This executor has subtle differences in the way that the
+scheduleAtFixedRate() performs. For example, recall our previous example in which
+tasks took five minutes to complete:
+
+ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
+service.scheduleAtFixedRate(command,3,1,TimeUnit.MINUTE);
+
+Whereas with a single-thread executor and a five-minute task execution time, an endless
+set of tasks would be scheduled over time. With a pooled executor, this can be avoided. If
+the pool size is sufficiently large, 10 for example, then as each thread finishes, it is returned
+to the pool and results in new threads available for the next tasks as they come up.
+*/
+	
+/**
+Choosing a Pool Size
+--------------------
+In practice, it can be quite difficult to choose an appropriate pool size. In general, you
+want at least a handful more threads than you think you will ever possibly need. On the
+other hand, you don't want to choose so many threads that your application uses up too
+many resources or too much CPU processing power. Oftentimes, the number of CPUs
+available is used to determine the thread size using this command:
+
+Runtime.getRuntime().availableProcessors()
+
+It is a common practice to allocate thread pools based on the number of CPUs, as well
+as how CPU intensive the task is. For example, if you are performing very CPU-intensive
+tasks, then creating a 16-thread pool in a 2-CPU computer will cause the computer to per-
+form quite slowly, as your process is chewing up most of the CPU bandwidth available for
+other applications. Alternatively, if your tasks involve reading/writing data from disk or a
+network, a 16-thread pool may be appropriate, since most of the waiting involves external
+resources.
+
+Fortunately, most tasks are dependent on some other resources, such as a database, file
+system, or network. In those situations, creating large thread pools is generally safe, as
+the tasks are not CPU intensive and may involve a lot of waiting for external resources to
+become available.
+ */
+
+	//return 8 in LINUX
+	System.out.println(Runtime.getRuntime().availableProcessors());
+
+	//LINUX
+	//$ cat /proc/cpuinfo | grep 'model name' | uniq
+	//model name	: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
+	//Cores:4, Threads: 8
+
+/**
+Synchronizing Data Access
+-------------------------
+Recall that thread safety is the property of an object that guarantees safe execution by multiple
+threads at the same time. Now that we have multiple threads capable of accessing the same
+objects in memory, we have to make sure to organize our access to this data such that we don’t
+end up with invalid or unexpected results. Since threads run in a shared environment and
+memory space, how do we prevent two threads from interfering with each other?
+
+page 350...
+
+the unexpected result of two tasks executing at the same time is referred to as a race condition
+*/
+	
+/**
+Protecting Data with Atomic Classes
+-----------------------------------
+With the release of the Concurrency API, Java added a new java.util.concurrent.atomic
+package to help coordinate access to primitive values and object references. As with most
+classes in the Concurrency API, these classes are added solely for convenience.
+
+Atomic is the property of an operation to be carried out as a single unit of execution
+without any interference by another thread. A thread-safe atomic version of the 
+increment operator would be one that performed the read and write of the variable as a single
+operation, not allowing any other threads to access the variable during the operation.
+
+Any thread trying to access the sheepCount variable while an atomic operation 
+is in process will have to wait until the atomic operation on the variable is complete. 
+Of course, this exclusivity applies only to the threads trying to access
+the sheepCount variable, with the rest of the memory space not affected by this operation.
+
+Since accessing primitives and references in Java is common in shared environments, the
+Concurrency API includes numerous useful classes that are conceptually the same 
+as our primitive classes but that support atomic operations.
+
+Atomic classes
+--------------
+-AtomicBoolean: A boolean value that may be updated atomically
+-AtomicInteger: An int value that may be updated atomically
+-AtomicIntegerArray: An int array in which elements may be updated atomically
+
+-AtomicLong, AtomicLongArray, 
+
+-AtomicReference, AtomicReferenceArray
+
+How do we use an atomic class? Each class includes numerous methods that are equiva-
+lent to many of the primitive built-in operators that we use on primitives, such as the
+assignment operator = and the increment operators ++
+
+Common atomic methods
+---------------------
+
+get(): 				Retrieve the current value
+set():				Set the given value, equivalent to the assignment = operator
+getAndSet() 		Atomically sets the new value and returns the old value
+incrementAndGet() 	For numeric classes, atomic pre-increment operation equivalent to ++value
+getAndIncrement() 	For numeric classes, atomic post-increment operation equivalent to value++
+decrementAndGet() 	For numeric classes, atomic pre-decrement operation equivalent to --value
+getAndDecrement() 	For numeric classes, atomic post-decrement operation equivalent to value--
+
+PAGE 354
 
 */
-		
+	
+	
+	
+	
+	
 	}
 	public static void main(String[] args) {
 		new Concurrency();
