@@ -2,12 +2,19 @@ package core;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.Console;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Serializable;
 
 public class JavaIO {
 	{
@@ -446,16 +453,342 @@ public class JavaIO {
 	the exam to determine if it is present.
 	
 	***The Serializable Interface
+	In order to serialize objects using the java.io API, the class they belong to must implement
+	the java.io.Serializable interface. The Serializable interface is a tagging or marker
+	interface, which means that it does not have any methods associated with it. Any class can
+	implement the Serializable interface since there are no required methods to implement.
+	The purpose of implementing the Serializable interface is to inform any process
+	attempting to serialize the object that you have taken the proper steps to make the object
+	serializable, which involves making sure that the classes of all instance variables within
+	the object are also marked Serializable . Many of the built-in Java classes that you have
+	worked with throughout this book, including the String class, are marked Serializable .
+	This means that many of the simple classes that we have built throughout this book can be
+	marked Serializable without any additional work.
 	
+	A process attempting to serialize an object will throw a NotSerializableException
+	if the class or one of its contained classes does not properly implement the Serializable
+	interface. Let’s say that you have a particular object within a larger object that is not
+	serializable, such as one that stores temporary state or metadata information about
+	the larger object. You can use the transient keyword on the reference to the object,
+	which will instruct the process serializing the object to skip it and avoid throwing a
+	NotSerializableException . The only limitation is that the data stored in the object will be
+	lost during the serialization process.
+	
+	Besides transient instance variables, static class members will also be ignored during
+	the serialization and deserialization process. This should follow logically, as static class
+	variables do not belong to one particular instance. If you need to store static class information,
+	it will be need to be copied to an instance object and serialized separately.
 		
  */
+	
+		try {
+		
+			String fileName4save = "C:\\del1\\DataFile.SAVED";
+			/*
+			FileOutputStream fileOutputStream = new FileOutputStream(fileName4save); 
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+			
+			DataFile dataFileW = new DataFile();
+			dataFileW.setName("eighta");
+			dataFileW.setNumber(Long.MAX_VALUE);
+			objectOutputStream.writeObject(dataFileW);
+			objectOutputStream.flush();
+			objectOutputStream.close();
+			*/
+			FileInputStream fileInputStream = new FileInputStream(fileName4save);
+			BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream); 
+			ObjectInputStream objectInputStream = new ObjectInputStream(bufferedInputStream);
+			
+			DataFile dataFileR = null;
+			
+			while(true) {
+				
+				try {
+					Object readObject = objectInputStream.readObject();
+					System.out.println(readObject.getClass());
+					dataFileR = (DataFile) readObject;
+				}catch(EOFException eofe) {
+					break;
+				}
+				System.out.println(dataFileR.getName() + "-" + dataFileR.getNumber() + "-" + dataFileR.getNewAttribute());
+				System.out.println(dataFileR.STATIC_VALUE);
+			}
+			objectInputStream.close();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}		
+		
+/**
+	LANZA
+	java.io.InvalidClassException: core.DataFile; 
+		local class incompatible: stream classdesc serialVersionUID = 7091955784967508124, 
+		local class serialVersionUID = 1
+	
+	This serialVersionUID is stored with the serialized object and assists during the deserialization
+	process. The serialization process uses the serialVersionUID to identify uniquely
+	a version of the class. That way, it knows whether the serialized data for an object will
+	match the instance variable in the current version of the class. If an older version of the
+	class is encountered during deserialization, an exception may be thrown. Alternatively,
+	some deserialization tools support conversions automatically.
+		 
+	the readObject() throws the checked exception, ClassNotFoundException, since
+	the class of the deserialized object may not be available to the JRE. Therefore, we need to
+	catch the exception or rethrow in our method signatures; in this case, we chose the latter.
+	Finally, since we are reading objects, we can’t use a -1 integer value to determine when
+	we have finished reading a file. Instead, the proper technique is to catch an EOFException,
+	which marks the program encountering the end of the file. Notice that we don’t do anything
+	with the exception other than finish the method. This is one of the few times when it
+	is perfectly acceptable to swallow an exception.
+
+	EOF Check Methods (WARNING)
+	---------------------------
+	You may come across code thSat reads from an InputStream and uses the snippet
+	while(in.available()>0) to check for the end of the stream, rather than checking for an
+	EOFException.
+	
+	The problem with this technique, and the Javadoc does echo this, is that it only tells you the
+	number of blocks that can be read without blocking the next caller. In other words, it can
+	return 0 even if there are more bytes to be read. Therefore, the InputStream available()
+	method should never be used to check for the end of the stream.
+
+	Understanding Object Creation
+	-----------------------------
+	For the exam, you need be aware of how a deserialized object is created. When you deserialize
+	an object, the constructor of the serialized class is not called. 
+	In fact, 
+		-Java calls the first no-arg constructor for the first nonserializable parent class, skipping the constructors of
+		any serialized class in between. 
+		
+		-Furthermore, any static variables or default initializations are ignored.
+	
+		-transient means the value won’t be included in the serialization process
+		
+	The PrintStream and PrintWriter Classes
+	---------------------------------------
+	The PrintStream and PrintWriter classes are high-level stream classes that write
+	formatted representation of Java objects to a text-based output stream. As you may have
+	ascertained by the name, the PrintStream class operates on OutputStream instances and
+	writes data as bytes, whereas the PrintWriter class operates on Writer instances and
+	writes data as characters.
+
+	For convenience, both of these classes include constructors that can open and write
+	to files directly. Furthermore, the PrintWriter class even has a constructor that takes an
+	OutputStream as input, allowing you to wrap a PrintWriter class around an OutputStream.
+	
+	These classes are primarily convenience classes in that you could write the low-level
+	primitive or object directly to a stream without a PrintStream or PrintWriter class,
+	although using one is helpful in a wide variety of situations.
+	In fact, the primary method class we have been using to output information to screen
+	throughout this book uses a PrintStream object! For the exam, you should be aware that
+	System.out and System.err are actually PrintStream objects.
+	
+	Because PrintStream inherits OutputStream and PrintWriter inherits from Writer ,
+	both support the underlying write() method while providing a slew of print-based
+	methods. For the exam, you should be familiar with the print() , println() , format() ,
+	and printf() methods. Unlike the underlying write() method, which throws a checked
+	IOException that must be caught in your application, these print-based methods do
+	not throw any checked exceptions. If they did, you would have been required to catch a
+	checked exception anytime you called System.out.println() in your code! Both classes
+	provide a method, checkError() , that can be used to detect the presence of a problem after
+	attempting to write data to the stream.
+	
+	***println()
+	The next methods available in the PrintStream and PrintWriter classes are the
+	println() methods, which are virtually identical to the print() methods, except that
+	they insert a line break after the String value is written. The classes also include a
+	version of println() that takes no arguments, which terminates the current line by
+	writing a line separator.
+	These methods are especially helpful, as the line break or separator character is JVM
+	dependent. For example, in some systems a line feed symbol, \n , signifi es a line break,
+	whereas other systems use a carriage return symbol followed by a line feed symbol, \r\n ,
+	to signify a line break. As you saw earlier in the chapter with file.separator , the line.
+	separator value is available as a Java system property at any time:
+	System.getProperty("line.separator");
+	
+	Although you can use print() instead of println() and insert all line
+	break characters manually, it is not recommended in practice. As the
+	line break character is OS dependent, it is recommended that you rely
+	on println() for inserting line breaks since it makes your code more
+	lightweight and portable.
+	
+	***format() and printf()
+	Like the String.format() method in PrintStream and PrintWriter takes a String , 
+	an optional locale, and a set of arguments, and it writes a formatted String to the stream based on the input. 
+	In other words, it is a convenience method for formatting directly to the stream. 
+	
+	For convenience, as well as to make C developers feel more at home in Java, the
+	PrintStream and PrintWriter APIs also include a set of printf() methods, which are
+	straight pass-through methods to the format() methods. For example, although the names
+	of the following two methods differ, their input values, output value, and behavior are
+	identical in Java. They can be used interchangeably:
+	
+		public PrintWriter format(String format, Object args. . .)
+		public PrintWriter printf(String format, Object args. . .)
+	
+*/
+		
+		PrintStream pStream = System.out;
+		OutputStream oStream = pStream; 
+		pStream.println("to pantalla");
+		String palabra = "palabra";
+		
+		try {
+			//OutputStream lanza exception, pero PrintStream que hereda de esta, no la lanza 
+			//pStream.write(palabra.getBytes(),0, palabra.length());
+			
+			pStream.checkError();
+			oStream.write(palabra.getBytes(),0, palabra.length());
+			
+			//https://stackoverflow.com/questions/2851234/system-out-to-a-file-in-java
+//			System.setOut(new PrintStream(new File("C:\\del1\\CONSOLE.txt")));
+			System.out.println("CONSOLA 2 ARCHIVO");
+			
+			//RESET
+//			System.setOut(pStream);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		
+		try {
+			PrintWriter printWriter = new PrintWriter(new FileWriter("C:\\del1\\OUTPUT.txt"));
+			printWriter.print("palabras");
+			printWriter.flush();
+			printWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+/**
+	Interacting with Users
+	----------------------
+	The java.io API includes numerous classes for interacting with the user. For example, you
+	might want to write an application that asks a user to log in and reads their login details.
+	In this section, we present the final java.io class that we will be covering in this book, the
+	java.io.Console class, or Console class for short.
+	
+	The Console class was introduced in Java 6 as a more evolved form of the System.in
+	and System.out stream classes. It is now the recommended technique for interacting with
+	and displaying information to the user in a text-based environment.
+
+	Before we delve into the Console class, let’s review the old way of obtaining text input from
+	the user. Similar to how System.out returns a PrintStream and is used to output text data
+	to the user, System.in returns an InputStream and is used to retrieve text input from the
+	user. It can be chained to a BufferedReader to allow input that terminates with the Enter
+	key. Before we can apply the BufferedReader, though, we need to wrap the System.in
+	object using the InputStreamReader class, which allows us to build a Reader object out of
+	an existing InputStream instance. The result is shown in the following application:
+ */
+		
+		try {
+			System.out.println("TYPE SOME: ");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+			
+			String userInput = reader.readLine();
+			System.out.println("You entered the following: "+ userInput);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+
+/**
+	The New Way
+	-----------
+	The System.in and System.out objects have been available since the earliest versions of
+	Java. In Java 6, the java.io.Console class was introduced with far more features and
+	abilities than the original techniques. After all, System.in and System.out are just raw
+	streams, whereas Console is a class with multiple convenience methods, one that is capable
+	of containing additional methods in the future.
+	
+	To begin, the Console class is a singleton, which as you may remember from Chapter 2
+	means that there is only one version of the object available in the JVM. It is created automatically
+	for you by the JVM and accessed by calling the System.console() method. Be
+	aware that this method will return null in environments where text interactions are not
+	supported.
+ */
+		/* ERROR EN ECLIPSE
+		Console console = System.console();
+		PrintWriter writerConsole = console.writer();
+		writerConsole.println("Utilizando la clase Console");
+		*/
+		
+		
+/**
+	****readPassword()
+	The readPassword() method is similar to the readLine() method, except that echoing is
+	disabled. By disabling echoing, the user does not see the text they are typing, meaning that
+	their password is secure if someone happens to be looking at their screen.
+	Also like the readLine() method, the Console class offers an overloaded version of the
+	readPassword() method with the signature readPassword(String format, Object. . .
+	args) used for displaying a formatted prompt to the user prior to accepting text. Unlike the
+	readLine() method, though, the readPassword() method returns an array of characters
+	instead of a String.
+	
+	Why Does readPassword() Return a Character Array?
+	-------------------------------------------------
+	As you may remember from your OCA study material, String values are added to a
+	shared memory pool for performance reasons in Java. This means that if a password that
+	a user typed in were to be returned to the process as a String, it might be available in the
+	String pool long after the user entered it.
+	
+	If the memory in the application is ever dumped to disk, it means that the password could
+	be recovered by a malicious individual after the user has stopped using the application.
+	The advantage of the readPassword() method using a character array should be clear.
+	As soon as the data is read and used, the sensitive password data in the array can be
+	“erased” by writing garbage data to the elements of the array. This would remove the
+	password from memory long before it would be removed by garbage collection if a
+	String value were used.
+	
+	PAGE 442
+	leer el resumen
+	hacer las preguntas
+ */
 		
 	}
 	
 	public static void main(String[] args) {
+		
+		//System.console().printf("INICIANDO...");
+		
 		new JavaIO();
 	}
 
+}
+
+class DataFile implements Serializable{
+	private static final long serialVersionUID = 7091955784967508124L;
+	private String name;
+	//transient means the value won’t be included in the serialization process
+	private transient Long number;
+	//default initializations are ignored.
+	private String newAttribute = "DEFAULT";
+	
+	public static Integer STATIC_VALUE = 123;
+	
+	public DataFile(){
+		this.newAttribute = "CONSTRUCTOR VALUE";
+	}
+	
+	public DataFile(String name, Long number) {
+		this.name = name;
+		this.number = number;
+		this.newAttribute = "CONSTRUCTOR VALUE";
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public Long getNumber() {
+		return number;
+	}
+	public void setNumber(Long number) {
+		this.number = number;
+	}
+	public String getNewAttribute() {
+		return newAttribute;
+	}
+	public void setNewAttribute(String newAttribute) {
+		this.newAttribute = newAttribute;
+	}
 }
