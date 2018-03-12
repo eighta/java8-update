@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
@@ -681,11 +682,17 @@ public class JavaIO {
  */
 		
 		try {
-			System.out.println("TYPE SOME: ");
-			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 			
-			String userInput = reader.readLine();
-			System.out.println("You entered the following: "+ userInput);
+			//InputStream in = System.in;
+			BufferedInputStream in = (BufferedInputStream) System.in;
+			System.out.println(in);
+			
+			//System.out.println("TYPE SOME: ");
+			//BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+			//String userInput = reader.readLine();
+			//System.out.println("You entered the following: "+ userInput);
+			
+			
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -701,9 +708,10 @@ public class JavaIO {
 	
 	To begin, the Console class is a singleton, which as you may remember from Chapter 2
 	means that there is only one version of the object available in the JVM. It is created automatically
-	for you by the JVM and accessed by calling the System.console() method. Be
-	aware that this method will return null in environments where text interactions are not
-	supported.
+	for you by the JVM and accessed by calling the System.console() method. 
+	
+	!!!Be aware that this method will return null in environments 
+	where text interactions are not supported.!!!
  */
 		/* ERROR EN ECLIPSE
 		Console console = System.console();
@@ -711,8 +719,25 @@ public class JavaIO {
 		writerConsole.println("Utilizando la clase Console");
 		*/
 		
+	//https://stackoverflow.com/questions/4203646/system-console-returns-null
+		/*
+		According to the API:
+		"If the virtual machine is started from an interactive command line without
+		redirecting the standard input and output streams then its console will exist
+		and will typically be connected to the keyboard and display from which the
+		virtual machine was launched. If the virtual machine is started automatically, 
+		for example by a background job scheduler, then it will typically not have a console."
+		*/
 		
 /**
+
+	***flush()
+	The flush() method forces any buffered output to be written immediately. It is recommended that
+	you call the flush() method prior to calling any readLine() or readPassword() methods in order
+	to ensure that no data is pending during the read. Failure to do so could result in a user prompt for
+	input with no preceding text, as the text prior to the prompt may still be in a buffer.
+
+
 	****readPassword()
 	The readPassword() method is similar to the readLine() method, except that echoing is
 	disabled. By disabling echoing, the user does not see the text they are typing, meaning that
@@ -738,10 +763,19 @@ public class JavaIO {
 	password from memory long before it would be removed by garbage collection if a
 	String value were used.
 	
-	PAGE 442
-	leer el resumen
-	hacer las preguntas
  */
+
+		System.out.println("=====");
+		
+		InputStream is = System.in;
+		PrintStream os = System.out;
+		os.println("normal text");
+		PrintStream err = System.err;
+		err.println("error text");
+		
+		//System.console().printf(format, args)
+		//System.console().format(fmt, args)
+		//System.console().writer().println(x);
 		
 	}
 	

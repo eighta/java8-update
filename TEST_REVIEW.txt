@@ -1,4 +1,33 @@
 #############
+OCP Chapter 8
+#############
+	answer			result
+1	A,B,D			FAIL	SOSO
+2	B,E,F			OK
+3	C,D				OK
+4	C,D				FAIL	EASY
+5	E				FAIL	SOSO
+6	A,E				OK
+7	D				OK
+8	A				OK
+9	A,(c),D			FAIL	TRICKY
+10	B				FAIL	TRICKY++
+11	C,E,G			OK
+12	B				FAIL	HEAVY
+13 	A,C,E			OK
+14	E				OK
+15	A				OK
+16	?				FAIL	SOSO
+17	A,B,D			FAIL	SOSO
+18	B,D,E			OK		SOSO
+19	B,C,D			OK
+20	A,C,E			FAIL	SOSO
+21	A,B,C			FAIL	TRICKY
+22	E				OK
+23	E 				FAIL	VERY HARD
+
+
+#############
 OCP Chapter 6
 #############
 	answer			result
