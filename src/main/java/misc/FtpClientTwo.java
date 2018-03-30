@@ -4,20 +4,18 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
-import javax.net.ssl.SSLException;
-
 import org.apache.commons.net.PrintCommandListener;
-import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPSClient;
 
 public class FtpClientTwo {
 
+	//https://www.thomas-krenn.com/en/wiki/Setup_FTP_Server_under_Debian
+	
 	public static void main(String[] args) throws Exception {
 		method();
 	}
@@ -41,8 +39,8 @@ public class FtpClientTwo {
 
 		
 		ftp.sendCommand("CWD","upload");
-		//readFiles(ftp);
-		storeFile(ftp);
+		readFiles(ftp);
+		//storeFile(ftp);
 		//retrieve(ftp);
 
 		// ftp.sendCommand("PORT", "192,168,0,17,239,251");
@@ -59,10 +57,12 @@ public class FtpClientTwo {
 
 	}
 
-	private static void retrieve(FTPClient ftp) throws Exception {
-		String remoteFileName = "songlist.txt";
-		File downloadFile = new File("C:/Yesta/songlist_DOWNLOADED_FTP.txt");
+	private static void retrieve(FTPSClient ftp) throws Exception {
+		String remoteFileName = "01.Adele - Hello (DJ Zhukovsky Remix).mp3";
+		File downloadFile = new File("C:/Yesta/"+remoteFileName);
 		OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile));
+		
+		sslOperationNeeded(ftp);
 		boolean success = ftp.retrieveFile(remoteFileName, outputStream1);
 		outputStream1.close();
 		System.out.println("success: " + success);
@@ -74,8 +74,7 @@ public class FtpClientTwo {
 	}
 
 	private static void readFiles(FTPSClient ftp) throws Exception {
-		
-		
+		sslOperationNeeded(ftp);
 		FTPFile[] listFiles = ftp.listFiles();
 		for (FTPFile ftpFile : listFiles) {
 			System.out.println("file: " + ftpFile.getName());
