@@ -1,4 +1,29 @@
 #############
+OCP Chapter 9
+#############
+	answer			result
+1	A				FAIL	TRICKY
+2	A,B,C,D,E		FAIL	SOSO
+3	D				OK
+4	C				OK		SOSO
+5	D				FAIL	???
+6	C				OK
+7	F				OK		SOSO
+8	A				OK		SOSO
+9	B,C,D,(E)		FAIL	HEAVY OF UNDERSTAND
+10	A,C,E			FAIL	HEAVY (OJO LA OPCION A, ES DEPENDIENTE DEL SISTEMA OPERATIVO)
+11	B				FAIL	VERIFICAR, PARECE UNA PREGUNTA CON RESPUESTA ERRADA
+12	A,F				OK		TRICKY
+13	A				FAIL	HEAVY
+14	E				OK	
+15	D,E,F  			OK		SOSO
+16	F				OK		HEAVY
+17	G				FAIL	TRICKY
+18	B				FAIL	HARD
+19	A,C,E			OK		SOSO
+20	B				OK		HEAVY
+
+#############
 OCP Chapter 8
 #############
 	answer			result
@@ -25,7 +50,6 @@ OCP Chapter 8
 21	A,B,C			FAIL	TRICKY
 22	E				OK
 23	E 				FAIL	VERY HARD
-
 
 #############
 OCP Chapter 6
