@@ -87,9 +87,12 @@ version of the open source Derby database that comes automatically with the JDK
 		try(Connection conn = DriverManager.getConnection(url,"username","password");){
 			System.out.println(conn.getClass());
 			createDatabase(conn);
-		
+			
 			try (	Statement stmt = conn.createStatement();
 					ResultSet rs = stmt.executeQuery("select name from animal") ) {
+				
+				//OJO OTRA SENTENCIA EJECUTADA, POR EL MISMO STATEMENT CERRARA EL RESULT SET
+				//stmt.executeUpdate("update animal set name = 'a' where name = 'ok'");
 			
 				while (rs.next())
 					System.out.println(rs.getString(1));
@@ -103,9 +106,9 @@ version of the open source Derby database that comes automatically with the JDK
 	
 	Building a JDBC URL
 	-------------------
-	To access a website, you need to know the URL of the website. To access your email, you
-	need to know your username and password. JDBC is no different. In order to access a
-	database, you need to know this information about it.
+	To access a website, you need to know the URL of the website. 
+	To access your email, you need to know your username and password. 
+	JDBC is no different. In order to access a database, you need to know this information about it.
 	
 	Unlike web URLs, a JDBC URL has a variety of formats. They have three parts in
 	common, as shows:
@@ -226,8 +229,10 @@ version of the open source Derby database that comes automatically with the JDK
 	
 	Choosing a ResultSet Type
 	-------------------------
-	By default, a ResultSet is in TYPE_FORWARD_ONLY mode. This is what you need most of the
-	time. You can go through the data once in the order in which it was retrieved.
+	By default, a ResultSet is in TYPE_FORWARD_ONLY mode. 
+	This is what you need most of the time. 
+	You can go through the data once in the order in which it was retrieved.
+	
 	Two other modes that you can request when creating a Statement are 
 		TYPE_SCROLL_INSENSITIVE and TYPE_SCROLL_SENSITIVE . 
 		
@@ -238,20 +243,22 @@ version of the open source Derby database that comes automatically with the JDK
 	
 	The difference between TYPE_SCROLL_INSENSITIVE and TYPE_SCROLL_SENSITIVE is what
 	happens when data changes in the actual database while you are busy scrolling. 
-	With TYPE_SCROLL_INSENSITIVE , you have a static view of what the ResultSet looked like when you
-	did the query. 
+	With TYPE_SCROLL_INSENSITIVE  you have a static view of what the ResultSet 
+	looked like when you did the query. 
 	
 	If the data changed in the table, you will see it as it was when you did the query. 
 	With TYPE_SCROLL_SENSITIVE , you would see the latest data when scrolling through
 	the ResultSet.
 	
-	We say “would” because most databases and database drivers don’t actually support the
+	We say "would" because most databases and database drivers don’t actually support the
 	TYPE_SCROLL_SENSITIVE mode. That’s right. You have to learn something for the exam that
 	you are almost guaranteed never to use in practice.
-	If the type you request isn’t available, the driver can “helpfully” downgrade to one that
-	is. This means that if you ask for TYPE_SCROLL_SENSITIVE , you will likely get a Statement
+	
+	LO SIGUIENTE NO APLICA PARA EL MOTOR UTILIZADO (sqllite) EN VEZ DE HACER EL DOWNGRADE LANZA UNA EXCEPTION
+	If the type you request isn’t available, the driver can "helpfully" downgrade to one that is. 
+	This means that if you ask for TYPE_SCROLL_SENSITIVE , you will likely get a Statement
 	that is TYPE_SCROLL_INSENSITIVE . Isn’t that great? If you’d wanted insensitive, you’d have
-	asked for that in the fi rst place!
+	asked for that in the first place!
 	
 	Choosing a ResultSet Concurrency Mode
 	-------------------------------------
@@ -269,6 +276,7 @@ version of the open source Derby database that comes automatically with the JDK
 	supported.
 
 */
+			//OJO, LOS DOS PARAMETROS NO SON ENUMS, SINO ENTEROS
 			Statement stmt = conn.createStatement(
 					ResultSet.TYPE_FORWARD_ONLY,					
 					//ResultSet.TYPE_SCROLL_SENSITIVE OR ResultSet.TYPE_SCROLL_INSENSITIVE
@@ -340,22 +348,24 @@ version of the open source Derby database that comes automatically with the JDK
 	does the opposite. It moves backward one row and returns true if pointing to a valid row
 	of data.		
 	
+	[[METHODs: first() and last()]]: return boolean
 	There are also methods to start at the beginning and end of the ResultSet. 
 	The first() and last() methods return a boolean for whether they were successful at finding a row.
 	
+	[[METHODs: beforeFirst() and afterLast()]]: return VOID
 	The beforeFirst() and afterLast() methods have a return type of void, since it is always
 	possible to get to a spot that doesn’t have data. Figure 10.5 shows these methods. You can
 	see that beforeFirst() and afterLast() don’t point to rows in the ResultSet.
 	
-	<<absolute(int) METHOD>> (uses negatives)
+	<<absolute(int) METHOD>> (uses negatives): return boolean
 	Another method that you need to know is absolute(). It takes the row number to
 	which you want to move the cursor as a parameter. A positive number moves the cursor to
 	that numbered row. Zero moves the cursor to a location immediately before the first row.
 	
 	A negative number means to start counting from the end of the ResultSet rather than
-	from the beginning. Figure
+	from the beginning. 
 	
-	<<relative(int) METHOD>> (uses negatives)
+	<<relative(int) METHOD>> (uses negatives): return boolean
 	Finally, there is a relative() method that moves forward or backward the requested
 	number of rows. It returns a boolean if the cursor is pointing to a row with data.
 		
