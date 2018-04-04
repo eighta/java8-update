@@ -2,7 +2,6 @@ package core;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,7 +9,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -65,7 +63,7 @@ public class JavaIO {
 		/home/smith/data/zoo.txt
 	
 	The following is a relative path to the same file, 
-	assuming the user’s current directory was set to /home/smith.
+	assuming the userï¿½s current directory was set to /home/smith.
 		data/zoo.txt
 	
 	Different operating systems vary in their format of path names. 
@@ -131,7 +129,7 @@ public class JavaIO {
 	which is a list of data elements presented sequentially.
 	
 	Streams should be conceptually thought of as a long, nearly never-ending
-	“stream of water” with data presented one “wave” at a time.
+	ï¿½stream of waterï¿½ with data presented one ï¿½waveï¿½ at a time.
 	
 	NOTA:
 	It may be helpful to visualize a stream as being so large that all of the
@@ -146,7 +144,7 @@ public class JavaIO {
 	we have no idea where the beginning or the end is. We just have a pointer to our 
 	current position in the stream and read data one block at a time.
 	
-	Each type of stream segments data into a “wave” or “block” in a particular way. 
+	Each type of stream segments data into a ï¿½waveï¿½ or ï¿½blockï¿½ in a particular way. 
 	For example, some stream classes read or write data as individual byte values. 
 	Other stream classes read or write individual characters or strings of characters. 
 	On top of that, some stream classes read or write groups of bytes or characters at a time, 
@@ -163,7 +161,7 @@ public class JavaIO {
 	handle reading/writing of a sequential data source. For example, you might construct a Java
 	application that submits data to a website using an input stream and reads the result via an
 	output stream.
-	In fact, you have been using streams since your first “Hello World” program! Java provides
+	In fact, you have been using streams since your first ï¿½Hello Worldï¿½ program! Java provides
 	three built-in streams, System.in, System.err, and System.out, the last of which we have
 	been using to output data to the screen
 	
@@ -250,9 +248,8 @@ public class JavaIO {
  */
 		//Reader
 		String file = "C:\\Yesta\\allFiles_2018-03-04.txt";
-		try{
-			FileReader fileReader = new FileReader(file);
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
+		try(FileReader fileReader = new FileReader(file);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);){
 			System.out.println(bufferedReader.readLine());
 			
 		}catch(Exception e) {e.printStackTrace();}
@@ -270,11 +267,10 @@ public class JavaIO {
 	in practice:
 */	
 		//InputStream
-		try{
-			ObjectInputStream objectStream = 
+		try(ObjectInputStream objectStream = 
 					new ObjectInputStream(
 						new BufferedInputStream(
-							new FileInputStream(file)));
+							new FileInputStream(file)));){
 			
 			System.out.println(objectStream.readObject());
 			
@@ -344,11 +340,11 @@ public class JavaIO {
 	or reset() on a class that does not support these operations will throw an exception at
 	runtime.
 	
-	Once you’ve verified that the stream can support these operations, you can call
+	Once youï¿½ve verified that the stream can support these operations, you can call
 	mark(int) with a read-ahead limit value. You can then read as many bytes as you want up
 	to the limit value. If at any point you want to go back to the earlier position where you last
-	called mark(), then you just call reset() and the stream will “revert” to an earlier state. In
-	practice, it’s not actually putting the data back into the stream but storing the data that was
+	called mark(), then you just call reset() and the stream will ï¿½revertï¿½ to an earlier state. In
+	practice, itï¿½s not actually putting the data back into the stream but storing the data that was
 	already read into memory for you to read again. Therefore, you should not call the mark()
 	operation with too large a value as this could take up a lot of memory.
 	
@@ -371,8 +367,8 @@ public class JavaIO {
 	or String, representing a path to the file.
 	
 	The data in a FileInputStream object is commonly accessed by successive calls to the
-	read() method until a value of -1 is returned, indicating that the end of the stream—in this
-	case the end of the file—has been reached. Although less common, you can also choose to
+	read() method until a value of -1 is returned, indicating that the end of the streamï¿½in this
+	case the end of the fileï¿½has been reached. Although less common, you can also choose to
 	stop reading the stream early just by exiting the loop, such as if some search String is found.
 	
 	When reading a single value of a FileInputStream instance, the read() method 
@@ -389,8 +385,7 @@ public class JavaIO {
 	which take a pointer to a byte array where the data is written.
 	The method returns an integer value indicating how many bytes can be read into the byte array.
 */
-		try {
-			FileInputStream fileInputStream = new FileInputStream(file);
+		try (FileInputStream fileInputStream = new FileInputStream(file);) {
 			int intReaded = fileInputStream.read();
 			System.out.println(intReaded);
 		} catch (Exception e) {
@@ -468,7 +463,7 @@ public class JavaIO {
 	
 	A process attempting to serialize an object will throw a NotSerializableException
 	if the class or one of its contained classes does not properly implement the Serializable
-	interface. Let’s say that you have a particular object within a larger object that is not
+	interface. Letï¿½s say that you have a particular object within a larger object that is not
 	serializable, such as one that stores temporary state or metadata information about
 	the larger object. You can use the transient keyword on the reference to the object,
 	which will instruct the process serializing the object to skip it and avoid throwing a
@@ -512,7 +507,7 @@ public class JavaIO {
 					break;
 				}
 				System.out.println(dataFileR.getName() + "-" + dataFileR.getNumber() + "-" + dataFileR.getNewAttribute());
-				System.out.println(dataFileR.STATIC_VALUE);
+				System.out.println(DataFile.STATIC_VALUE);
 			}
 			objectInputStream.close();
 		}catch(Exception e) {
@@ -535,9 +530,9 @@ public class JavaIO {
 	the readObject() throws the checked exception, ClassNotFoundException, since
 	the class of the deserialized object may not be available to the JRE. Therefore, we need to
 	catch the exception or rethrow in our method signatures; in this case, we chose the latter.
-	Finally, since we are reading objects, we can’t use a -1 integer value to determine when
+	Finally, since we are reading objects, we canï¿½t use a -1 integer value to determine when
 	we have finished reading a file. Instead, the proper technique is to catch an EOFException,
-	which marks the program encountering the end of the file. Notice that we don’t do anything
+	which marks the program encountering the end of the file. Notice that we donï¿½t do anything
 	with the exception other than finish the method. This is one of the few times when it
 	is perfectly acceptable to swallow an exception.
 
@@ -562,7 +557,7 @@ public class JavaIO {
 		
 		-Furthermore, any static variables or default initializations are ignored.
 	
-		-transient means the value won’t be included in the serialization process
+		-transient means the value wonï¿½t be included in the serialization process
 		
 	The PrintStream and PrintWriter Classes
 	---------------------------------------
@@ -672,7 +667,7 @@ public class JavaIO {
 	and System.out stream classes. It is now the recommended technique for interacting with
 	and displaying information to the user in a text-based environment.
 
-	Before we delve into the Console class, let’s review the old way of obtaining text input from
+	Before we delve into the Console class, letï¿½s review the old way of obtaining text input from
 	the user. Similar to how System.out returns a PrintStream and is used to output text data
 	to the user, System.in returns an InputStream and is used to retrieve text input from the
 	user. It can be chained to a BufferedReader to allow input that terminates with the Enter
@@ -759,7 +754,7 @@ public class JavaIO {
 	be recovered by a malicious individual after the user has stopped using the application.
 	The advantage of the readPassword() method using a character array should be clear.
 	As soon as the data is read and used, the sensitive password data in the array can be
-	“erased” by writing garbage data to the elements of the array. This would remove the
+	"erased" by writing garbage data to the elements of the array. This would remove the
 	password from memory long before it would be removed by garbage collection if a
 	String value were used.
 	
@@ -767,6 +762,7 @@ public class JavaIO {
 
 		System.out.println("=====");
 		
+		@SuppressWarnings("unused")
 		InputStream is = System.in;
 		PrintStream os = System.out;
 		os.println("normal text");
@@ -791,7 +787,7 @@ public class JavaIO {
 class DataFile implements Serializable{
 	private static final long serialVersionUID = 7091955784967508124L;
 	private String name;
-	//transient means the value won’t be included in the serialization process
+	//transient means the value wonï¿½t be included in the serialization process
 	private transient Long number;
 	//default initializations are ignored.
 	private String newAttribute = "DEFAULT";

@@ -24,6 +24,7 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.List;
 import java.util.stream.Stream;
 
+@SuppressWarnings({ "unused", "resource" })
 public class JavaNIO2 {
 
 	{

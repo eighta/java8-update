@@ -14,6 +14,7 @@ public class JavaGenericsExamples {
 		
 		//Cuando se utiliza Unbounded wildcard (?) o upper bound (? extends)
 		//la coleccion becomes logically immutable, es decir no se pueden añadir elementos
+		@SuppressWarnings("unused")
 		List<? extends Inner> innerExtendsList = new ArrayList<>();
 		//COMPILATION ERROR innerExtendsList.add(new Inner());
 		//COMPILATION ERROR innerExtendsList.add(new InMiddle());

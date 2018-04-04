@@ -253,6 +253,7 @@ public class JavaCollections {
 		if (true) return;
 		
 		//New Java 8 Map API
+		@SuppressWarnings("unused")
 		Map<String, String> favorites = new HashMap<>();
 		favorites.put("Jenny", "Bus Tour");
 		//replace (normal way)

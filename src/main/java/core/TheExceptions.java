@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.time.format.DateTimeParseException;
 import java.util.NoSuchElementException;
 
+@SuppressWarnings("unused")
 public class TheExceptions {
 
 	{
