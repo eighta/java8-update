@@ -1,5 +1,7 @@
 package core;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -7,7 +9,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicLongArray;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.stream.Stream;
 
+@SuppressWarnings("unused")
 public class Concurrency {
 
 	{
@@ -451,41 +462,44 @@ perform the task after some delay, and return a ScheduledFuture<V> instance.
 ScheduledFuture<V> is identical to the Future<V> class, 
 except that it includes a getDelay() method that returns the delay set when the process was created.
 
-While these tasks are scheduled in the future, the actual execution may
-be delayed. For example, there may be no threads available to perform
-the task, at which point they will just wait in the queue. Also, if the
-ScheduledExecutorService is shut down by the time the scheduled task
+While these tasks are scheduled in the future, the actual execution may be delayed. 
+For example, there may be no threads available to perform the task, 
+at which point they will just wait in the queue. 
+Also, if the ScheduledExecutorService is shut down by the time the scheduled task
 execution time is reached, they will be discarded.
 
 The last two methods might be a little confusing if you have not seen them before. 
 Conceptually, they are very similar as they both perform the same task repeatedly,
-after completing some initial delay. The difference is related to the timing of the process and
-when the next task starts.
+after completing some initial delay. 
+The difference is related to the timing of the process and when the next task starts.
 
-The scheduleAtFixedRate() method creates a new task and submits it to the executor
-every period, regardless of whether or not the previous task finished. 
+The scheduleAtFixedRate() method creates a new task and submits it to the executor every period, 
+regardless of whether or not the previous task finished.
+ 
 The following example executes a Runnable task every minute, 
 following an initial five minute delay:
 
-service.scheduleAtFixedRate(command,5,1,TimeUnit.MINUTE);
+	service.scheduleAtFixedRate(command,5,1,TimeUnit.MINUTE);
 
-One risk of using this method is the possibility a task could consistently take lon-
-ger to run than the period between tasks. What would happen if the task consis-
-tently took fi ve minutes to execute? Despite the fact that the task is still running, the
-ScheduledExecutorService would submit a new task to be started every minute. If a
-single-thread executor was used, over time this would result in endless set tasks being
-scheduled, which would run back to back assuming that no other tasks were submitted to
-the ScheduledExecutorService .
+One risk of using this method is the possibility a task could consistently take 
+longer to run than the period between tasks. 
+
+What would happen if the task consistently took five minutes to execute? 
+Despite the fact that the task is still running, the ScheduledExecutorService would 
+submit a new task to be started every minute. 
+
+If a single-thread executor was used, over time this would result in endless set tasks being scheduled, 
+which would run back to back assuming that no other tasks were submitted to the ScheduledExecutorService.
+
 On the other hand, the scheduleAtFixedDelay() method creates a new task after the
-previous task has fi nished. For example, if the fi rst task runs at 12:00 and takes fi ve min-
-utes to fi nish, with a period of 2 minutes, then the second task will start at 12:07.
+previous task has finished. For example, if the first task runs at 12:00 and takes five minutes 
+to finish, with a period of 2 minutes, then the second task will start at 12:07.
 
-service.scheduleAtFixedDelay(command,0,2,TimeUnit.MINUTE);
+	service.scheduleAtFixedDelay(command,0,2,TimeUnit.MINUTE);
 
-Notice that neither of the methods, scheduleAtFixedDelay() and
-scheduleAtFixedRate() , take a Callable object as an input parameter.
-Since these tasks are scheduled to run infinitely, as long as the
-ScheduledExecutorService is still alive, they would generate an endless
+Notice that neither of the methods, scheduleAtFixedDelay() and scheduleAtFixedRate(), 
+take a Callable object as an input parameter. Since these tasks are scheduled to run infinitely, 
+as long as the ScheduledExecutorService is still alive, they would generate an endless
 series of Future objects.
 
 Each of the ScheduledExecutorService methods is important and has real-world applications.
@@ -498,13 +512,12 @@ an animal on Monday, this doesn’t mean that Tuesday’s exam should start any 
 
 Finally, scheduleAtFixedDelay() is useful for processes that you want to happen
 repeatedly but whose specific time is unimportant. For example, imagine that we have a zoo
-cafeteria worker who periodically restocks the salad bar throughout the day. The process can
-take 20 minutes or more, since it requires the worker to haul a large number of items from the
-back room. Once the worker has filled the salad bar with fresh food, he doesn’t need to check
-at some specific time, just after enough time has passed for it to become low on stock again.
-*/
-	
-/**
+cafeteria worker who periodically restocks the salad bar throughout the day. 
+The process can take 20 minutes or more, since it requires the worker to haul 
+a large number of items from the back room. Once the worker has filled the salad bar with fresh food, 
+he doesn’t need to check at some specific time, just after enough time has passed 
+for it to become low on stock again.
+
 Increasing Concurrency with Pools
 ---------------------------------
 Now present three additional factory methods in the Executors class that act on a
@@ -531,19 +544,23 @@ Creates a thread pool that reuses a fixed number of threads operating off a shar
 
 -newScheduledThreadPool(int nThreads):ScheduledExecutorService
 Creates a thread pool that can schedule commands to run after a given delay or to execute periodically.
-
- */
-	Executors.newSingleThreadExecutor();
-	Executors.newSingleThreadScheduledExecutor();
-	Executors.newCachedThreadPool();
-	Executors.newFixedThreadPool(5);
-	Executors.newScheduledThreadPool(5);
+*/
+	//Singles
+	ExecutorService newSingleThreadExecutor = Executors.newSingleThreadExecutor();
+	ScheduledExecutorService newSingleThreadScheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+	
+	//Pooled
+	ExecutorService newCachedThreadPool = Executors.newCachedThreadPool();
+	ExecutorService newFixedThreadPool = Executors.newFixedThreadPool(5);
+	ScheduledExecutorService newScheduledThreadPool = Executors.newScheduledThreadPool(5);
+	
 //There are also overloaded versions of each of the methods 
 //that create threads using a ThreadFactory input parameter.
 	ThreadFactory threadFactory = Executors.defaultThreadFactory();
 	Executors.newSingleThreadExecutor(threadFactory);
 	Executors.newSingleThreadScheduledExecutor(threadFactory);
 	//...
+
 /**
 The difference between a single-thread and a pooled-thread executor is what happens
 when a task is already running. While a single-thread executor will wait for an available
@@ -551,42 +568,36 @@ thread to become available before running the next task, a pooled-thread executo
 execute the next task concurrently.
 
 If the pool runs out of available threads, the task will be queued by the thread executor and wait to be completed.
- */
-	
-/**
-The newCachedThreadPool() method will create a thread pool of unbounded size,
+ 
+***The newCachedThreadPool() method will create a thread pool of unbounded size,
 allocating a new thread anytime one is required or all existing threads are busy. 
 This is commonly used for pools that require executing many short-lived asynchronous tasks. 
+
 For long-lived processes, usage of this executor is strongly discouraged, as it could grow to
 encompass a large number of threads over the application life cycle.	
- */
-	
-/**
-The newFixedThreadPool() takes a number of threads and allocates them all upon creation. 
+ 
+***The newFixedThreadPool() takes a number of threads and allocates them all upon creation. 
 As long as our number of tasks is less than our number of threads, all tasks will be executed concurrently. 
+
 If at any point the number of tasks exceeds the number of threads in the pool, 
 they will wait in similar manner as you saw with a single-thread executor. 
 
 In fact, calling newFixedThreadPool() with a value of 1 is equivalent to calling newSingleThreadExecutor().	
- */
 
-/**
-The newScheduledThreadPool() is identical to the newFixedThreadPool() method,
+***The newScheduledThreadPool() is identical to the newFixedThreadPool() method,
 except that it returns an instance of ScheduledExecutorService and is therefore
-compatible with scheduling tasks. This executor has subtle differences in the way that the
-scheduleAtFixedRate() performs. For example, recall our previous example in which
-tasks took five minutes to complete:
+compatible with scheduling tasks. 
+This executor has subtle differences in the way that the scheduleAtFixedRate() performs. 
+For example, recall our previous example in which tasks took five minutes to complete:
 
-ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
-service.scheduleAtFixedRate(command,3,1,TimeUnit.MINUTE);
+	ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
+	service.scheduleAtFixedRate(command,3,1,TimeUnit.MINUTE);
 
 Whereas with a single-thread executor and a five-minute task execution time, an endless
-set of tasks would be scheduled over time. With a pooled executor, this can be avoided. If
-the pool size is sufficiently large, 10 for example, then as each thread finishes, it is returned
-to the pool and results in new threads available for the next tasks as they come up.
-*/
-	
-/**
+set of tasks would be scheduled over time. With a pooled executor, this can be avoided. 
+If the pool size is sufficiently large, 10 for example, then as each thread finishes, 
+it is returned to the pool and results in new threads available for the next tasks as they come up.
+
 Choosing a Pool Size
 --------------------
 In practice, it can be quite difficult to choose an appropriate pool size. In general, you
@@ -594,32 +605,31 @@ want at least a handful more threads than you think you will ever possibly need.
 other hand, you don't want to choose so many threads that your application uses up too
 many resources or too much CPU processing power. Oftentimes, the number of CPUs
 available is used to determine the thread size using this command:
-
-Runtime.getRuntime().availableProcessors()
-
-It is a common practice to allocate thread pools based on the number of CPUs, as well
-as how CPU intensive the task is. For example, if you are performing very CPU-intensive
-tasks, then creating a 16-thread pool in a 2-CPU computer will cause the computer to per-
-form quite slowly, as your process is chewing up most of the CPU bandwidth available for
-other applications. Alternatively, if your tasks involve reading/writing data from disk or a
-network, a 16-thread pool may be appropriate, since most of the waiting involves external
-resources.
-
-Fortunately, most tasks are dependent on some other resources, such as a database, file
-system, or network. In those situations, creating large thread pools is generally safe, as
-the tasks are not CPU intensive and may involve a lot of waiting for external resources to
-become available.
- */
-
+*/
+	int availableProcessors = Runtime.getRuntime().availableProcessors();
+	System.out.println("availableProcessors: " + availableProcessors);
+	
 	//return 8 in LINUX
-	System.out.println(Runtime.getRuntime().availableProcessors());
-
+	
 	//LINUX
 	//$ cat /proc/cpuinfo | grep 'model name' | uniq
 	//model name	: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
 	//Cores:4, Threads: 8
 
 /**
+It is a common practice to allocate thread pools based on the number of CPUs, as well
+as how CPU intensive the task is. For example, if you are performing very CPU-intensive
+tasks, then creating a 16-thread pool in a 2-CPU computer will cause the computer to 
+perform quite slowly, as your process is chewing up most of the CPU bandwidth available for
+other applications. Alternatively, if your tasks involve reading/writing data from disk or a
+network, a 16-thread pool may be appropriate, since most of the waiting involves external
+resources.
+
+Fortunately, most tasks are dependent on some other resources, such as a database, 
+file system, or network. In those situations, creating large thread pools is generally safe, as
+the tasks are not CPU intensive and may involve a lot of waiting for external resources to
+become available.
+
 Synchronizing Data Access
 -------------------------
 Recall that thread safety is the property of an object that guarantees safe execution by multiple
@@ -628,17 +638,15 @@ objects in memory, we have to make sure to organize our access to this data such
 end up with invalid or unexpected results. Since threads run in a shared environment and
 memory space, how do we prevent two threads from interfering with each other?
 
-page 350...
+sample at page 350...
 
 the unexpected result of two tasks executing at the same time is referred to as a race condition
-*/
-	
-/**
+
 Protecting Data with Atomic Classes
 -----------------------------------
-With the release of the Concurrency API, Java added a new java.util.concurrent.atomic
-package to help coordinate access to primitive values and object references. As with most
-classes in the Concurrency API, these classes are added solely for convenience.
+With the release of the Concurrency API, Java added a new 
+java.util.concurrent.atomic package to help coordinate access to primitive values and object references. 
+As with most classes in the Concurrency API, these classes are added solely for convenience.
 
 Atomic is the property of an operation to be carried out as a single unit of execution
 without any interference by another thread. A thread-safe atomic version of the 
@@ -656,21 +664,33 @@ as our primitive classes but that support atomic operations.
 
 Atomic classes
 --------------
--AtomicBoolean: A boolean value that may be updated atomically
--AtomicInteger: An int value that may be updated atomically
--AtomicIntegerArray: An int array in which elements may be updated atomically
+*/
+	//A boolean value that may be updated atomically
+	AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+	
+	//An int value that may be updated atomically
+	AtomicInteger atomicInteger = new AtomicInteger(1);
+	//An int array in which elements may be updated atomically
+	int length = 4;
+	AtomicIntegerArray atomicIntegerArray = new AtomicIntegerArray(length); 
 
--AtomicLong, AtomicLongArray, 
+	//A long value that may be updated atomically
+	AtomicLong atomicLong = new AtomicLong(2L);
+	//A long array in which elements may be updated atomically
+	AtomicLongArray atomicLongArray = new AtomicLongArray(length); 
 
--AtomicReference, AtomicReferenceArray
+	//A generic object reference that may be updated atomically
+	AtomicReference<Object> atomicReference = new AtomicReference<>(new Object());
+	//An array of generic object references in which elements may be updated atomically
+	AtomicReferenceArray<Object> atomicReferenceArray = new AtomicReferenceArray<>(new Object[]{});
 
-How do we use an atomic class? Each class includes numerous methods that are equiva-
-lent to many of the primitive built-in operators that we use on primitives, such as the
+/**	
+How do we use an atomic class? Each class includes numerous methods that are 
+equivalent to many of the primitive built-in operators that we use on primitives, such as the
 assignment operator = and the increment operators ++
 
 Common atomic methods
 ---------------------
-
 get(): 				Retrieve the current value
 set():				Set the given value, equivalent to the assignment = operator
 getAndSet() 		Atomically sets the new value and returns the old value
@@ -679,15 +699,642 @@ getAndIncrement() 	For numeric classes, atomic post-increment operation equivale
 decrementAndGet() 	For numeric classes, atomic pre-decrement operation equivalent to --value
 getAndDecrement() 	For numeric classes, atomic post-decrement operation equivalent to value--
 
-PAGE 354
+sample at PAGE 354
 
+Improving Access with Synchronized Blocks
+-----------------------------------------
+How do we improve the results so that each worker is able to increment and report the
+results in order? The most common technique is to use a monitor, also called a lock, 
+to synchronize access. 
+
+A monitor is a structure that supports mutual exclusion or the property
+that at most one thread is executing a particular segment of code at a given time.
+
+In Java, any Object can be used as a monitor, along with the synchronized keyword, as
+shown in the following example:
 */
 	
-	
-	
-	
-	
+	Object obj = new Object();
+	synchronized(obj){
+		// Work to be completed by one thread at a time
 	}
+/**	
+This example is referred to as a synchronized block. Each thread that arrives will first
+check if any threads are in the block. In this manner, a thread “acquires the lock” for the
+monitor. If the lock is available, a single thread will enter the block, acquiring the lock and
+preventing all other threads from entering. While the first thread is executing the block, all
+threads that arrive will attempt to acquire the same lock and wait for first thread to finish.
+Once a thread finishes executing the block, it will release the lock, allowing one of the
+waiting threads to proceed.
+
+sample PAGE 355
+
+Synchronizing Methods
+---------------------
+In the previous example, we established our monitor using synchronized(this) around the
+body of the method. Java actually provides a more convenient compiler enhancement for
+doing so. We can add the synchronized modifier to any instance method to synchronize
+automatically on the object itself. 
+
+For example, the following two method definitions are equivalent:
+<CODE>
+***1
+private void incrementAndReport() {
+	synchronized(this) {
+		System.out.print((++sheepCount)+" ");
+	}
+}
+***2
+private synchronized void incrementAndReport() {
+	System.out.print((++sheepCount)+" ");
+}
+
+</CODE>
+
+The first uses a synchronized block, whereas the second uses the synchronized method
+modifier. Which you use is completely up to you.
+
+We can also add the synchronized modifier to static methods. 
+What object is used as the monitor when we synchronize on a static method? 
+The class object, of course! For example, the following two methods are equivalent 
+for static synchronization inside our SheepManager class:
+
+<CODE>
+***1
+public static void printDaysWork() {
+	synchronized(SheepManager.class) {
+		System.out.print("Finished work");
+	}
+}
+***2
+public static synchronized void printDaysWork() {
+	System.out.print("Finished work");
+}
+</CODE>
+
+As before, the first uses a synchronized block, with the second example using the synchronized modifier. 
+You can use static synchronization if you need to order thread access across all instances, 
+rather than a single instance.
+
+Understanding the Cost of Synchronization
+-----------------------------------------
+We complete this section by noting that synchronization, while useful, may be costly in practice. 
+While multi-threaded programming is about doing multiple things at the same time, 
+synchronization is about taking multiple threads and making them perform in a more
+single-threaded manner.
+
+For example, let’s say that we have a highly concurrent class with numerous methods
+that synchronize on the same object. Let’s say that 50 concurrent threads access it. 
+Let’s also say that, on average, each thread takes a modest 100 milliseconds to execute.
+In this example, if all of the threads try to access the monitor at the same time, how long
+will it take for them to complete their work, assuming that 50 threads are available in the
+thread pool?
+
+50 threads x 100 milliseconds 
+= 5,000 milliseconds = 5 seconds
+
+Even though five seconds may not seem like a lot, it’s actually pretty long in 
+computer time. What if 50 new tasks are created before the five seconds are up? 
+This will pile onto the workload, resulting in most threads constantly entering a waiting or
+“stuck” state. 
+
+In the application, this may cause tasks that would normally be quick to finish 
+in a non-synchronized environment to take a significantly long amount of time to complete.
+
+Synchronization is about protecting data integrity at the cost of performance. 
+In many cases, performance costs are minimal, but in extreme scenarios the application could
+slow down significantly due to the inclusion of synchronization. Being able to identify
+synchronization problems, including finding ways to improve performance in synchronized
+multi-threaded environments, is a valuable skill in practice.
+
+Using Concurrent Collections
+============================
+Besides managing threads, the Concurrency API includes interfaces and classes that help
+you coordinate access to collections across multiple tasks. By collections, we are of course
+referring to the Java Collections Framework. 
+
+In this section, we will demonstrate many of the new concurrent classes
+available to you when using the Concurrency API.
+
+Introducing Concurrent Collections
+----------------------------------
+The first question you might be asking is “Do we really need new concurrent collection
+classes?” After all, in the previous section you saw that we can use the synchronized
+keyword on any method or block, so couldn’t we do the same for our existing collection
+classes? The short answer is “We could.”
+
+So then, why use a concurrent collection class? Like using ExecutorService to man-
+age threads for us, using the concurrent collections is extremely convenient in practice. It
+also prevents us from introducing mistakes in own custom implementation, such as if we
+forgot to synchronize one of the accessor methods. In fact, the concurrent collections often
+include performance enhancements that avoid unnecessary synchronization. Accessing
+collections from across multiple threads is so common that the writers of Java thought it
+would be a good idea to have alternate versions of many of the regular collections classes
+just for multi-threaded access.
+
+Understanding Memory Consistency Errors
+---------------------------------------
+The purpose of the concurrent collection classes is to solve common memory consistency errors. 
+A memory consistency error occurs when two threads have inconsistent views of what should be the same data. 
+Conceptually, we want writes on one thread to be available to another thread if it accesses the concurrent 
+collection after the write has occurred.
+
+When two threads try to modify the same non-concurrent collection, the JVM may
+throw a ConcurrentModificationException at runtime. In fact, it can happen with a single
+thread. Take a look at the following code snippet:
+
+<CODE>
+Map<String, Object> foodData = new HashMap<String, Object>();
+foodData.put("penguin", 1);
+foodData.put("flamingo", 2);
+for(String key: foodData.keySet())
+	foodData.remove(key);
+</CODE>
+
+This snippet will throw a ConcurrentModificationException at runtime, since the
+iterator keyset() is not properly updated after the first element is removed. 
+Changing the first line to use a ConcurrentHashMap will prevent the code from throwing an exception at
+runtime:
+
+<CODE>
+Map<String, Object> foodData = new ConcurrentHashMap<String, Object>();
+foodData.put("penguin", 1);
+foodData.put("flamingo", 2);
+for(String key: foodData.keySet())
+	foodData.remove(key);
+</CODE>
+
+Although we don’t usually modify a loop variable, this example highlights the fact that
+the ConcurrentHashMap is ordering read/write access such that all access to the class is
+consistent. In this code snippet, the iterator created by keySet() is updated as soon as an
+object is removed from the Map .
+
+The concurrent classes were created to help avoid common issues in which multiple
+threads are adding and removing objects from the same collections. At any given instance,
+all threads should have the same consistent view of the structure of the collection.
+
+Working with Concurrent Classes
+-------------------------------
+There are numerous collection classes with which you should be familiar for the exam.
+Luckily, you already know how to use most of them, as the methods available are a superset
+to the non-concurrent collection classes that you learned about in Chapter 3.
+You should use a concurrent collection class anytime that you are going to have multiple
+threads modify a collections object outside a synchronized block or method, even if you
+don’t expect a concurrency problem. On the other hand, if all of the threads are accessing an
+established immutable or read-only collection, a concurrent collection class is not required.
+In the same way that we instantiate an ArrayList object but pass around a List reference,
+it is considered a good practice to instantiate a concurrent collection but pass it around using
+a non-concurrent interface whenever possible. This has some similarities with the factory
+pattern that you learned about in Chapter 2, as the users of these objects may not be aware
+of the underlying implementation. In some cases, the callers may need to know that it is a
+concurrent collection so that a concurrent interface or class is appropriate, but for the majority
+of circumstances, that distinction is not necessary.
+
+Concurrent Collections
+----------------------
+ConcurrentHashMap
+ConcurrentLinkedDeque
+ConcurrentLinkedQueue
+
+ConcurrentSkipListMap
+ConcurrentSkipListSet
+
+CopyOnWriteArrayList
+CopyOnWriteArraySet
+
+LinkedBlockingDeque
+LinkedBlockingQueue
+
+The ConcurrentHashMap implements the ConcurrentMap interface, also found in the Concurrency API.
+You can use either reference type, Map or ConcurrentMap , to access a ConcurrentHashMap object, 
+depending on whether or not you want the caller to know anything about the underlying implementation. 
+
+For example, a method signature may require a ConcurrentMap reference to ensure that object passed to 
+it is properly supported in a multi-threaded environment.
+
+Understanding Blocking Queues
+-----------------------------
+Two queue classes that implement blocking interfaces: LinkedBlockingQueue and LinkedBlockingDeque. 
+The BlockingQueue is just like a regular Queue, except that it includes methods that will wait 
+a specific amount of time to complete an operation.
+
+Since BlockingQueue inherits all of the methods from Queue , we skip the inherited
+methods and present the new waiting methods:
+
+-offer(E e, long timeout, TimeUnit unit)
+Adds item to the queue waiting the specified time, returning false if time elapses before space is available
+
+-poll(long timeout, TimeUnit unit)
+Retrieves and removes an item from the queue, waiting the specified time, returning null if the time elapses
+before the item is available
+
+PAGE 361 
+
+Understanding SkipList Collections
+----------------------------------
+The SkipList classes, ConcurrentSkipListSet and ConcurrentSkipListMap, are concurrent versions of 
+their sorted counterparts, TreeSet and TreeMap, respectively. 
+
+They maintain their elements or keys in the natural ordering of their elements. 
+When you see SkipList or SkipSet on the exam, just think "sorted" concurrent collections 
+and the rest should follow naturally.
+
+Like other queue examples, it is recommended that you assign these objects to interface references, 
+such as SortedMap or NavigableSet. 
+In this manner, using them is the same as the code that you worked with in Chapter 3.
+
+Understanding CopyOnWrite Collections
+-------------------------------------
+The classes CopyOnWriteArrayList and CopyOnWriteArraySet, 
+behave a little differently than the other concurrent examples that you have seen. 
+These classes copy all of their elements to a new underlying structure anytime an element is
+added, modified, or removed from the collection. 
+
+By a modified element, we mean that the reference in the collection is changed. 
+Modifying the actual contents of the collection will not cause a new structure to be allocated.
+
+Although the data is copied to a new underlying structure, our reference to the object
+does not change. This is particularly useful in multi-threaded environments that need
+to iterate the collection. 
+
+Any iterator established prior to a modification will not see the changes, 
+but instead it will iterate over the original elements prior to the modification.
+Let’s take a look at how this works with an example:
+
+<CODE>
+List<Integer> list = new CopyOnWriteArrayList<>(Arrays.asList(4,3,52));
+for(Integer item: list) {
+	System.out.print(item+" ");
+	list.add(9);
+}
+
+System.out.println("Size: "+list.size());
+
+</CODE>
+
+When executed as part of a program, this code snippet outputs the following:
+4 3 52
+Size: 6
+
+Despite adding elements to the array while iterating over it, only those elements in the
+collection at the time the for() loop was created were accessed. Alternatively, if we had
+used a regular ArrayList object, a ConcurrentModificationException would have been
+thrown at runtime. With either class, though, we avoid entering an infinite loop in which
+elements are constantly added to the array as we iterate over them.
+
+The CopyOnWrite classes are similar to the immutable object pattern that
+you saw in Chapter 2 , as a new underlying structure is created every time
+the collection is modified. Unlike the immutable object pattern, though, the
+reference to the object stays the same even while the underlying data is
+changed. Therefore, strictly speaking, this is not an immutable object pat-
+tern, although it shares many similarities.
+
+The CopyOnWrite classes can use a lot of memory, since a new collection structure needs
+be allocated anytime the collection is modifi ed. They are commonly used in multi-threaded
+environment situations where reads are far more common than writes.
+
+
+Obtaining Synchronized Collections
+----------------------------------
+Besides the concurrent collection classes that we have covered, the Concurrency API also
+includes methods for obtaining synchronized versions of existing non-concurrent collection
+objects. These methods, defined in the Collections class, contain synchronized methods
+that operate on the inputted collection and return a reference that is the same type as the
+underlying collection.
+
+>>>Synchronized collections methods<<<
+--------------------------------------
+synchronizedCollection(Collection<T> c)
+synchronizedList(List<T> list)
+synchronizedMap(Map<K,V> m)
+synchronizedNavigableMap(NavigableMap<K,V> m)
+synchronizedNavigableSet(NavigableSet<T> s)
+synchronizedSet(Set<T> s)
+synchronizedSortedMap(SortedMap<K,V> m)
+synchronizedSortedSet(SortedSet<T> s)
+
+While this methods synchronize access to the data elements, 
+such as the get() and set() methods, they do not synchronize access on any iterators that you
+may create from the synchronized collection. Therefore, it is imperative that you use a
+synchronization block if you need to iterate over any of the returned collections, 
+as shown in the following example:
+
+<CODE>
+List<Integer> list = Collections.synchronizedList(new ArrayList<>(Arrays.asList(4,3,52)));
+synchronized(list) {
+	for(int data: list)
+		System.out.print(data+" ");
+}
+</CODE>
+
+Unlike the concurrent collections, the synchronized collections also throw an exception
+if they are modified within an iterator by a single thread. For example, take a look at the
+following modification of our earlier example:
+
+<CODE>
+Map<String, Object> foodData = new HashMap<String, Object>();
+foodData.put("penguin", 1);
+foodData.put("flamingo", 2);
+
+Map<String,Object> synchronizedFoodData = Collections.synchronizedMap(foodData);
+
+for(String key: synchronizedFoodData.keySet())
+	synchronizedFoodData.remove(key);
+</CODE>
+	
+This code throws a ConcurrentModificationException at runtime, 
+whereas our example that used ConcurrentHashMap did not. 
+Other than iterating over the collection, the objects returned by the methods in Table 7.12 
+are inherently safe to use among multiple threads.
+
+Working with Parallel Streams
+=============================
+In Chapter 4 , you learned that the Streams API enabled functional programming in Java 8. 
+One of the most powerful features of the Streams API is that it has built-in concurrency support. 
+Up until now, all of the streams with which you have worked have been serial streams. 
+
+A serial stream is a stream in which the results are ordered, with only one entry being processed at a time.
+
+A parallel stream is a stream that is capable of processing results concurrently, 
+using multiple threads. For example, you can use a parallel stream and the stream map() method
+to operate concurrently on the elements in the stream, vastly improving performance over
+processing a single element at a time.
+
+Using a parallel stream can change not only the performance of your application but
+also the expected results. As you shall see, some operations also require special handling to
+be able to be processed in a parallel manner.
+
+NOTE: By default, the number of threads available in a parallel stream is related to
+the number of available CPUs in your environment. In order to increase the
+thread count, you would need to create your own custom class.
+
+Creating Parallel Streams
+-------------------------
+The Streams API was designed to make creating parallel streams quite easy. For the exam,
+you should be familiar with the two ways of creating a parallel stream.
+
+-parallel()
+The first way to create a parallel stream is from an existing stream. 
+You just call parallel() on an existing stream to convert it to one that supports 
+multi-threaded processing, as shown in the following code:
+*/
+	Stream<Integer> stream = Arrays.asList(1,2,3,4,5,6).stream();
+	System.out.println("stream.isParallel(): " + stream.isParallel());
+	Stream<Integer> parallelStream = stream.parallel();
+	System.out.println("parallelStream.isParallel(): " + parallelStream.isParallel());
+	System.out.println(stream == parallelStream);
+/**
+Be aware that parallel() is an intermediate operation that operates on the original stream.
+
+-parallelStream()
+The second way to create a parallel stream is from a Java collection class. 
+The Collection interface includes a method parallelStream() that can be called on any collection and
+returns a parallel stream. 
+
+The following is a revised code snippet that creates the parallel stream directly from the List object:
+ */
+	Stream<Integer> parallelStream2 = Arrays.asList(1,2,3,4,5,6).parallelStream();
+	System.out.println("parallelStream2.isParallel(): " + parallelStream2.isParallel());
+/**	
+The Stream interface includes a method isParallel() that can be used to test 
+if the instance of a stream supports parallel processing. 
+
+Some operations on streams preserve the parallel attribute, while others do not. 
+For example, the Stream.concat(Stream s1, Stream s2) is parallel if either s1 or s2 is parallel. 
+*/
+	Stream<String> numberStream = Arrays.asList("1","2","3").stream();
+	Stream<String> alphaStream = Arrays.asList("A","B","C").stream();
+	Stream<String> numberAlphaStream = Stream.concat(numberStream, alphaStream);
+	System.out.println("numberAlphaStream.isParallel(): " + numberAlphaStream.isParallel());
+	
+	Stream<String> aStream = Arrays.asList("1","2","3").stream();
+	Stream<String> pStream = Arrays.asList("A","B","C").parallelStream();
+	Stream<String> anotherParallelStream = Stream.concat(aStream, pStream); 
+	System.out.println("anotherParallelStream.isParallel(): " + anotherParallelStream.isParallel());
+	
+/**
+On the other hand, flatMap() creates a new stream that is not parallel by default, 
+regardless of whether the underlying elements were parallel.
+
+	CREAR UN EJEMPLO DE LO ANTERIOR!
+	
+Processing Tasks in Parallel
+============================
+As you may have noticed, creating the parallel stream is the easy part. 
+The interesting part comes in using it. 
+
+Let’s take a look at a serial example:
+
+<CODE>
+	Arrays.asList(1,2,3,4,5,6).stream()
+		.forEach(s -> System.out.print(s+" "));
+</CODE>
+
+What do you think this code will output when executed as part of a main() method?
+Let’s take a look:
+1 2 3 4 5 6
+
+As you might expect, the results are ordered and predictable because we are using a
+serial stream. 
+
+What happens if we use a parallel stream, though?	
+	
+ */
+	Arrays.asList(1,2,3,4,5,6).parallelStream()
+		.forEach(s -> System.out.print(s+" "));
+	
+/**
+With a parallel stream, the forEach() operation is applied across multiple elements of the stream concurrently.	
+
+The following are each sample outputs of this code snippet:
+4 1 6 5 2 3
+5 2 1 3 6 4
+1 2 6 4 5 3
+
+As you can see, the results are no longer ordered or predictable. If you compare this to
+earlier parts of the chapter, the forEach() operation on a parallel stream is equivalent to
+submitting multiple Runnable lambda expressions to a pooled thread executor.
+
+Ordering forEach Results
+------------------------
+The Streams API includes an alternate version of the forEach() operation called forEachOrdered(), 
+which forces a parallel stream to process the results in order at the cost of performance. 
+
+For example, take a look at the following code snippet:
+	Arrays.asList(1,2,3,4,5,6)
+		.parallelStream()
+		.forEachOrdered(s -> System.out.print(s+" "));
+		
+Like our starting example, this outputs the results in order:
+	1 2 3 4 5 6
+
+Since we have ordered the results, we have lost some of the performance gains of using a parallel stream, 
+so why use this method? You might be calling this method in a section of your application that takes 
+both serial and parallel streams, and you need to ensure that the results are processed in a particular order. 
+
+Also, stream operations that occur before/after the forEachOrdered() can still gain performance improvements 
+for using a parallel stream.
+
+Understanding Performance Improvements
+--------------------------------------
+Let’s look at another example to see how much using a parallel stream may improve per-
+formance in your applications. Let’s say that you have a task that requires processing 4,000
+records, with each record taking a modest 10 milliseconds to complete. The following is a
+sample implementation that uses Thread.sleep() to simulate processing the data:
+
+*/
+		// Process the data (SERIAL)
+		WhaleDataCalculator.processAllData(Arrays.asList(1,2,3,4,5,6,7,8,9,10).stream());
+		
+		// Process the data (parallel)
+		WhaleDataCalculator.processAllData(Arrays.asList(1,2,3,4,5,6,7,8,9,10).parallelStream());
+
+/**
+(THE REAL EXAMPLE IS IN PAGE 421)
+Given that there are 4,000 records, and each record takes 10 milliseconds to process,
+by using a serial stream() , the results will take approximately 40 seconds to complete this
+task. Each task is completed one at a time: Tasks completed in: 40.044 seconds
+ 
+If we use a parallel stream, though, the results can be processed concurrently:
+
+Depending on the number of CPUs available in your environment, the following is a
+possible output of the code using a parallel stream:
+Tasks completed in: 10.542 seconds
+
+You see that using a parallel stream can have a four-fold improvement in the results.
+Even better, the results scale with the number of processors. 
+
+Scaling is the property that, as we add more resources such as CPUs, the results gradually improve.
+Does that mean that all of your streams should be parallel? Not exactly. 
+Parallel streams tend to achieve the most improvement when the number of elements in the stream is
+significantly large. For small streams, the improvement is often limited, as there are some
+overhead costs to allocating and setting up the parallel processing.
+		
+As with earlier examples in this chapter, the performance of using parallel
+streams will vary with your local computing environment. 
+There is never a guarantee that using a parallel stream will improve performance. 
+In fact, using a parallel stream could slow the application due to the overhead
+of creating the parallel processing structures. That said, in a variety of
+circumstances, applying parallel streams could result in significant performance gains.
+
+Understanding Independent Operations
+------------------------------------
+Parallel streams can improve performance because they rely on the property that many stream
+operations can be executed independently. By independent operations, we mean that the results
+of an operation on one element of a stream do not require or impact the results of another
+element of the stream. 
+
+For example, in the previous example, each call to processRecord() can be executed separately, 
+without impacting any other invocation of the method.
+
+As another example, consider the following lambda expression supplied to the map() method, 
+which maps the stream contents to uppercase strings:
+<CODE>
+Arrays.asList("jackal","kangaroo","lemur")
+	.parallelStream()
+	.map(s -> s.toUpperCase())
+	.forEach(System.out::println);
+</CODE>
+	
+In this example, mapping jackal to JACKAL can be done independently of mapping kangaroo to KANGAROO. 
+In other words, multiple elements of the stream can be processed at
+the same time and the results will not change.
+
+Many common streams including map(), forEach(), and filter() can be processed independently, 
+although order is never guaranteed.
+
+Consider the following modified version of our previous stream code:
+<CODE>
+Arrays.asList("jackal","kangaroo","lemur")
+	.parallelStream()
+	.map(s -> {System.out.println(s); return s.toUpperCase();})
+	.forEach(System.out::println);
+</CODE>
+This example includes an embedded print statement in the lambda passed to the map() method. 
+While the return values of the map() operation are the same, the order in which
+they are processed can result in very different output. 
+
+We might even print terminal results before the intermediate operations have finished, 
+as shown in the following generated output:
+	kangaroo
+	KANGAROO
+	lemur
+	jackal
+	JACKAL
+	LEMUR
+
+When using streams, you should avoid any lambda expressions that can produce side effects.
+
+For the exam, you should remember that parallel streams can process
+results independently, although the order of the results cannot be determined ahead of time.
+
+Avoiding Stateful Operations
+----------------------------
+Side effects can also appear in parallel streams if your lambda expressions are stateful. 
+A stateful lambda expression is one whose result depends on any state that might change 
+during the execution of a pipeline. 
+
+On the other hand, a stateless lambda expression is one whose result does not depend on any state 
+that might change during the execution of a pipeline.
+
+Let’s take a look an example to see why stateful lambda expressions should be avoided in parallel streams:
+<CODE>
+	List<Integer> data = Collections.synchronizedList(new ArrayList<>());
+	Arrays.asList(1,2,3,4,5,6).parallelStream()
+		.map(i -> {data.add(i); return i;}) // AVOID STATEFUL LAMBDA EXPRESSIONS!
+		.forEachOrdered(i -> System.out.print(i+" "));
+
+	System.out.println();
+	for(Integer e: data) {
+		System.out.print(e+" ");
+	}
+</CODE>
+
+The following is a sample generation of this code snippet using a parallel stream:
+1 2 3 4 5 6
+2 4 3 5 6 1
+
+The forEachOrdered() method displays the numbers in the stream sequentially, whereas the
+order of the elements in the data list is completely random. You can see that a stateful lambda
+expression, which modifies the data list in parallel, produces unpredictable results at runtime.
+
+Note that this would not have been noticeable with a serial stream, where the results
+would have been the following:
+1 2 3 4 5 6
+1 2 3 4 5 6
+
+It strongly recommended that you avoid stateful operations when using parallel streams,
+so as to remove any potential data side effects. In fact, they should generally be avoided in
+serial streams wherever possible, since they prevent your streams from taking advantage of
+parallelization.
+
+Using Concurrent Collections with Parallel Streams
+--------------------------------------------------
+We applied the parallel stream to a synchronized list in the previous example. 
+Anytime you are working with a collection with a parallel stream, it is recommended that you use
+a concurrent collection. 
+
+For example, if we had used a regular ArrayList rather than a synchronized one, 
+we could have seen output such as the following:
+1 2 3 4 5 6
+null 2 4 5 6 1
+
+For an ArrayList object, the JVM internally manages a primitive array of the same type. 
+As the size of the dynamic ArrayList grows, a new, larger primitive array is periodically required. 
+If two threads both trigger the array to be resized at the same time, a result can be lost, 
+producing the unexpected value shown here. 
+
+As briefly mentioned earlier, and also discussed later in this chapter, 
+the unexpected result of two tasks executing at the same time is a race condition.
+
+Processing Parallel Reductions
+==============================
+PAGE 372
+
+*/
+		
+	
+	}	
 	public static void main(String[] args) {
 		new Concurrency();
 	}
@@ -702,4 +1349,23 @@ class CalculateAverage implements Runnable {
 
 class CheckResults{
 	public static int counter = 0;
+}
+
+class WhaleDataCalculator {
+	private static int processRecord(int input) {
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return input+1;
+	}
+
+	public static void processAllData(Stream<Integer> dataStream) {
+		long start = System.currentTimeMillis();
+		dataStream.map(a -> processRecord(a)).count();
+		double time = (System.currentTimeMillis()-start)/1000.0;
+		// Report results
+		System.out.println("\nTasks completed in: "+time+" seconds");
+	}
 }
