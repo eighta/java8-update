@@ -243,7 +243,6 @@ as a Collection of Future objects, in the same order they were in the original c
 Executes the given tasks, synchronously returning the result of one of finished tasks, 
 cancelling any unfinished tasks
 
-
 Submitting Tasks: execute() vs submit()
 ---------------------------------------
 As you might have noticed, the execute() and submit() methods are nearly identical when
@@ -352,7 +351,6 @@ Callable object and returns a generic Future<T> object.
  
 Ambiguous Lambda Expressions: Callable vs. Supplier
 ---------------------------------------------------
-
 You may remember from Chapter 4 that the Callable functional interface strongly
 resembles the Supplier functional interface, in that they both take no arguments and
 return a generic type. One difference is that the method in Callable can throw a checked
@@ -465,8 +463,9 @@ after completing some initial delay. The difference is related to the timing of 
 when the next task starts.
 
 The scheduleAtFixedRate() method creates a new task and submits it to the executor
-every period, regardless of whether or not the previous task fi nished. The following exam-
-ple executes a Runnable task every minute, following an initial fi ve-minute delay:
+every period, regardless of whether or not the previous task finished. 
+The following example executes a Runnable task every minute, 
+following an initial five minute delay:
 
 service.scheduleAtFixedRate(command,5,1,TimeUnit.MINUTE);
 
