@@ -1,8 +1,9 @@
 package core;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -1329,9 +1330,401 @@ the unexpected result of two tasks executing at the same time is a race conditio
 
 Processing Parallel Reductions
 ==============================
-PAGE 372
+Besides possibly improving performance and modifying the order of operations, 
+using parallel streams can impact how you write your application. 
+
+Reduction operations on parallel streams are referred to as parallel reductions. 
+The results for parallel reductions can be different from what you expect when working with serial streams.
+
+Performing Order-Based Tasks
+----------------------------
+Since order is not guaranteed with parallel streams, methods such as findAny() on parallel
+streams may result in unexpected behavior. 
+
+Let’s take a look at the results of findAny() applied to a serial stream:
+
+	System.out.print(Arrays.asList(1,2,3,4,5,6).stream().findAny().get());
+
+This code consistently outputs the first value in the serial stream, 1 
+
+With a parallel stream, the JVM can create any number of threads to process the stream.
+When you call findAny() on a parallel stream, the JVM selects 
+the first thread to finish the task and retrieves its data:
+
+	System.out.print(Arrays.asList(1,2,3,4,5,6).parallelStream().findAny().get());	
+
+The result is that the output could be 4, 1, or really any value in the stream. 
+You can see that with parallel streams, the results of findAny() are no longer predictable.
+
+Any stream operation that is based on order, including findFirst(), limit(), or skip(), 
+may actually perform more slowly in a parallel environment. This is a result of a
+parallel processing task being forced to coordinate all of its threads in a synchronized-like fashion.
+
+On the plus side, the results of ordered operations on a parallel stream will be consistent
+with a serial stream. For example, calling skip(5).limit(2).findFirst() will return the
+same result on ordered serial and parallel streams.
+
+Creating Unordered Streams
+--------------------------
+All of the streams with which you have been working are considered ordered by default.
+It is possible to create an unordered stream from an ordered stream, similar to how you
+create a parallel stream from a serial stream:
+	
+	Arrays.asList(1,2,3,4,5,6).stream().unordered();
+	
+This method does not actually reorder the elements; it just tells the JVM that if an
+order-based stream operation is applied, the order can be ignored. 
+
+For example, calling skip(5) on an unordered stream will skip any 5 elements, 
+not the first 5 required on an ordered stream.
+
+For serial streams, using an unordered version has no effect, but on parallel streams, 
+the results can greatly improve performance:
+	
+	Arrays.asList(1,2,3,4,5,6).stream().unordered().parallel();
+
+Even though unordered streams will not be on the exam, if you are developing applications 
+with parallel streams, you should know when to apply an unordered stream to improve performance.
+
+
+Combining Results with reduce() (:-D)
+-------------------------------
+As you learned in Chapter 4, the stream operation reduce() combines a stream into a
+single object. Recall that first parameter to the reduce() method is called the identity, 
+the second parameter is called the accumulator, and the third parameter is called the combiner.
+
+We can concatenate a string using the reduce() method to produce wolf, 
+as shown in the following example:
+
+	System.out.println(
+		Arrays.asList('w', 'o', 'l', 'f').stream()
+			.reduce(	"",					//IDENTITY
+						(c,s1) -> c + s1,	//ACCUMULATOR
+						(s2,s3) -> s2 + s3) //COMBINER
+	);
+	
+The naming of the variables in this stream example is not accidental. 
+The variable c is interpreted as a char, whereas s1, s2, and s3 are String values. 
+Recall that in the three-argument version of reduce(), 
+the accumulator is a BiFunction, while the combiner is BinaryOperator .	
+	
+On parallel streams, the reduce() method works by applying the reduction to pairs of
+elements within the stream to create intermediate values and then combining those 
+intermediate values to produce a final result. 
+
+Whereas with a serial stream, wolf was built one character at a time, 
+in a parallel stream, the intermediate strings wo and lf could have been
+created and then combined.
+
+With parallel streams, though, we now have to be concerned about order. 
+What if the elements of a string are combined in the wrong order to produce wlfo or flwo? 
+The Streams API prevents this problem, while still allowing streams to be processed in parallel,
+as long as the arguments to the reduce() operation adhere to certain principles.
+
+Requirements for reduce() Arguments
+-----------------------------------
+-The identity must be defined such that for all elements in the stream u,
+combiner.apply(identity, u) is equal to u
+
+-The accumulator operator op must be associative and stateless such that "(a op b) op c"
+is equal to "a op (b op c)" 
+
+(La propiedad asociativa aparece en el contexto del álgebra 
+y se aplica a dos tipos de operaciones: la suma y la multiplicación. 
+Esta propiedad indica que, cuando existen tres o más cifras en estas operaciones, 
+el resultado no depende de la manera en la que se agrupan los términos)
+
+-The combiner operator must also be associative and stateless and compatible with the
+identity, such that for all u and t combiner.apply(u,accumulator.apply(identity,t))
+is equal to accumulator.apply(u,t) 
+
+If you follow these principles when building your reduce() arguments, then the
+operations can be performed using a parallel stream and the results will be ordered as they
+would be with a serial stream. Note that these principles still apply to the identity and
+accumulator when using the one- or two-argument version of reduce() on parallel streams.
+
+While the requirements for the input arguments to the reduce() method
+hold true for both serial and parallel streams, you may not have noticed
+any problems in serial streams because the result was always ordered.
+
+With parallel streams, though, order is no longer guaranteed, and an 
+argument that violates one of these rules is much more likely to produce side
+effects and/or unpredictable results.
+
+Let’s take a look at an example using a non-associative accumulator. 
+In particular, subtracting numbers (restar numeros) is not an associative operation; 
+therefore the following code can output different values depending 
+on whether you use a serial or parallel stream:
+
+	System.out.println(
+		Arrays.asList(1,2,3,4,5,6)
+			.parallelStream()
+			.reduce(0,(a,b) -> (a-b))); // NOT AN ASSOCIATIVE ACCUMULATOR
+
+It may output -21 , 3 , or some other value, as the accumulator function violates 
+the associativity property.
+
+You can see other problems if we use an identity parameter that is not truly an identity value. 
+For example, what do you expect the following code to output?
+
+	System.out.println(
+		Arrays.asList("w","o","l","f")
+			.parallelStream()
+			.reduce("X",String::concat));
+			
+In fact, it can output XwXoXlXf. As part of the parallel process, the identity is applied to
+multiple elements in the stream, resulting in very unexpected data.
+
+Using the Three-Argument reduce() Method
+----------------------------------------
+Although the one- and two-argument versions of reduce() do support parallel processing, 
+it is recommended that you use the three-argument version of reduce() when
+working with parallel streams. Providing an explicit combiner method allows the JVM to
+partition the operations in the stream more efficiently.
+
+Combing Results with collect()
+==============================
+Like reduce(), the Streams API includes a three-argument version of collect() that takes
+accumulator and combiner operators, along with a supplier operator instead of an identity.
+
+Also like reduce(), the accumulator and combiner operations must be associative 
+and stateless, with the combiner operation compatible with the accumulator operator, 
+as previously discussed. In this manner, the three-argument version of collect() can be performed
+as a parallel reduction, as shown in the following example:
+
+	Stream<String> stream = Stream.of("w", "o", "l", "f").parallel();
+	SortedSet<String> set = stream.collect(
+								ConcurrentSkipListSet::new, 
+								Set::add,
+								Set::addAll);
+								
+	System.out.println(set); // [f, l, o, w]
+	
+Recall that elements in a ConcurrentSkipListSet are sorted according to their natural ordering.
+You should use a concurrent collection to combine the results, ensuring that the results
+of concurrent threads do not cause a ConcurrentModificationException 
+
+Using the One-Argument collect() Method
+---------------------------------------
+Recall that the one-argument version of collect() takes a collector argument, as shown in
+the following example:
+	
+	Stream<String> stream = Stream.of("w", "o", "l", "f").parallel();
+	Set<String> set = stream.collect(Collectors.toSet());
+	System.out.println(set); // [f, w, l, o]
+	
+Performing parallel reductions with a collector requires additional considerations. 
+For example, if the collection into which you are inserting is an ordered data set, such as a List, 
+then the elements in the resulting collection must be in the same order, regardless of
+whether you use a serial or parallel stream. This may reduce performance, though, as some
+operations are unable to be completed in parallel.
+
+The following rules ensure that a parallel reduction will be performed efficiently in Java
+using a collector.
+
+Requirements for Parallel Reduction with collect():
+-The stream is parallel.
+
+-The parameter of the collect operation has the 
+Collector.Characteristics.CONCURRENT characteristic.
+
+-Either the stream is unordered, or the collector has the characteristic
+Collector.Characteristics.UNORDERED
+
+Any class that implements the Collector interface includes a characteristics()
+method that returns a set of available attributes for the collector. 
+
+While Collectors.toSet() does have the UNORDERED characteristic, 
+it does not have the CONCURRENT characteristic; therefore the previous collector example 
+will not be performed as a concurrent reduction.
+
+The Collectors class includes two sets of methods for retrieving collectors
+that are both UNORDERED and CONCURRENT, 
+Collectors.toConcurrentMap() and Collectors.groupingByConcurrent(), 
+and therefore it is capable of performing parallel reductions efficiently. 
+
+Like their non-concurrent counterparts, there are overloaded versions
+that take additional arguments.
+
+Here is a rewrite of an example from Chapter 4 to use 
+a parallel stream and parallel reduction:
+
+	Stream<String> ohMy = Stream.of("lions", "tigers", "bears").parallel();
+	ConcurrentMap<Integer, String> map = 
+			ohMy.collect(
+				Collectors.toConcurrentMap(
+					String::length, 
+					k -> k,
+					(s1, s2) -> s1 + "," + s2));
+					
+	System.out.println(map); // {5=lions,bears, 6=tigers}
+	System.out.println(map.getClass()); // java.util.concurrent.ConcurrentHashMap
+
+We use a ConcurrentMap reference, although the actual class returned is likely
+ConcurrentHashMap. The particular class is not guaranteed; it will just be a class that
+implements the interface ConcurrentMap.
+
+Finally, we can rewrite our groupingBy() example from Chapter 4 to use a parallel
+stream and parallel reduction:
+
+	Stream<String> ohMy = Stream.of("lions", "tigers", "bears").parallel();
+	ConcurrentMap<Integer, List<String>> map = 
+		ohMy.collect(
+				Collectors.groupingByConcurrent(String::length));
+				
+	System.out.println(map); // {5=[lions, bears], 6=[tigers]}
+	
+As before, the returned object can be assigned a ConcurrentMap reference.
+
+Encouraging Parallel Processing
+-------------------------------
+Guaranteeing that a particular stream will perform reductions in a parallel, as opposed
+to single-threaded, is often difficult in practice. For example, the one-argument reduce()
+operation on a parallel stream may perform concurrently even when there is no explicit
+combiner argument. Alternatively, you may expect some collectors to perform well on a
+parallel stream, resorting to single-threaded processing at runtime.
+
+The key to applying parallel reductions is to encourage the JVM to take advantage of
+the parallel structures, such as using a groupingByConcurrent() collector on a parallel
+stream rather than a groupingBy() collector. By encouraging the JVM to take advantage
+of the parallel processing, we get the best possible performance at runtime.
+
+Managing Concurrent Processes
+=============================
+The Concurrency API includes classes that can be used to coordinate tasks among a group
+of related threads. These classes are designed for use in specific scenarios, 
+similar to many of the design patterns that you saw in Chapter 2. In this section, 
+we present two classes with which you should be familiar for the exam, 
+CyclicBarrier and ForkJoinPool.
+
+Creating a CyclicBarrier
+------------------------
+Our zoo workers are back, and this time they are cleaning pens. 
+Imagine that there is a lion pen that needs to emptied, cleaned, and then filled back up with the lions. 
+
+To complete the task, we have assigned four zoo workers. 
+Obviously, we don’t want to start cleaning the cage while a lion is roaming in it, lest we end up losing a zoo worker! 
+Furthermore, we don’t want to let the lions back into the pen while it is still being cleaned.
+
+We could have all of the work completed by a single worker, but this would be slow and
+ignore the fact that we have three zoo workers standing by to help. A better solution would
+be to have all four zoo employees work concurrently, pausing between the end of one set of
+tasks and the start of the next.
+
+To coordinate these tasks, we can use the CyclicBarrier class. 
+For now, let’s start with a code sample without a CyclicBarrier:
+*/
+
+		if(false){
+			try {
+				service = Executors.newFixedThreadPool(4);
+				LionPenManager manager = new LionPenManager();		
+				for(int i=0; i<4; i++)
+					service.submit(() -> manager.performTask());
+			} finally {
+				if(service != null) service.shutdown();
+			}
+		}
+		
+/**
+The following is sample output based on this implementation:
+	Removing animals
+	Removing animals
+	Cleaning the pen
+	Adding animals
+	Removing animals
+	Cleaning the pen
+	Adding animals
+	Removing animals
+	Cleaning the pen
+	Adding animals
+	Cleaning the pen
+	Adding animals
+
+Although within a single thread the results are ordered, among multiple workers the
+output is entirely random. We see that some animals are still being removed while the cage
+is being cleaned, and other animals are added before the cleaning process is finished. 
+
+In our conceptual example, this would be quite chaotic and would not lead to a very clean cage.
+We can improve these results by using the CyclicBarrier class. 
+
+The CyclicBarrier takes in its constructors a limit value, indicating the number of threads to wait for. 
+As each thread finishes, it calls the await() method on the cyclic barrier. 
+Once the specified number of threads have each called await(), 
+the barrier is released and all threads can continue.
+
+The following is a reimplementation of our LionPenManager class that uses
+CyclicBarrier objects to coordinate access:
+*/
+		
+		System.out.println(">>Using CyclicBarrier<<");
+		try {
+			service = Executors.newFixedThreadPool(4);
+			LionPenManager2 manager = new LionPenManager2();
+			
+			CyclicBarrier c1 = new CyclicBarrier(4);
+			CyclicBarrier c2 = new CyclicBarrier(4,
+									() -> System.out.println("*** Pen Cleaned!"));
+			for(int i=0; i<4; i++)
+				service.submit(() -> manager.performTask(c1,c2));
+			
+		} finally {
+			if(service != null) service.shutdown();
+		}
+/**
+As you can see, all of the results are now organized. Removing the animals all happens in one step, 
+as does cleaning the pen and adding the animals back in. 
+
+In this example, we used two different constructors for our CyclicBarrier objects, 
+the latter of which called a Runnable method upon completion.
+
+Thread Pool Size and Cyclic Barrier Limit
+-----------------------------------------
+If you are using a thread pool, make sure that you set the number of available threads to
+be at least as large as your CyclicBarrier limit value. 
+
+For example, what if we changed the code to allocate only two threads, such as in the following snippet?
+
+	ExecutorService service = Executors.newFixedThreadPool(2);
+	
+In this case, the code will hang indefinitely. The barrier would never be reached as the
+only threads available in the pool are stuck waiting for the barrier to be complete. As you
+shall see in the next section, this is a form of deadlock
+
+The CyclicBarrier class allows us to perform complex, multi-threaded tasks, while all
+threads stop and wait at logical barriers. This solution is superior to a single-threaded solu-
+tion, as the individual tasks, such as removing the animals, can be completed in parallel by
+all four zoo workers.
+
+There is a slight loss in performance to be expected from using a CyclicBarrier . For
+example, one worker may be incredibly slow at removing lions, resulting in the other three
+workers waiting for him to finish. Since we can’t start cleaning the pen while it is full of
+lions, though, this solution is about as concurrent as we can make it.
+
+Reusing CyclicBarrier
+---------------------
+After a CyclicBarrier is broken, all threads are released and the number of threads waiting 
+on the CyclicBarrier goes back to zero. At this point, the CyclicBarrier may be
+used again for a new set of waiting threads. For example, if our CyclicBarrier limit is 5
+and we have 15 threads that call await() , then the CyclicBarrier will be activated a total
+of three times
+
+Applying the Fork/Join Framework
+================================
+Suppose that we need to measure the weight of all of the animals in our zoo. 
+Further suppose that we ask exactly one person to perform this task and complete it in an hour.
+What’s the first thing that person is likely to do? Probably ask for help!
+
+In most of the examples in this chapter, we knew at the start of the process exactly how
+many threads and tasks we needed to perform. Sometimes, we aren’t so lucky. It may be
+that we have five threads, or five zoo workers in our example, but we have no idea how
+many tasks need to be performed. When a task gets too complicated, we can split the task
+into multiple other tasks using the fork/join framework.
+
+
 
 */
+		
 		
 	
 	}	
@@ -1367,5 +1760,36 @@ class WhaleDataCalculator {
 		double time = (System.currentTimeMillis()-start)/1000.0;
 		// Report results
 		System.out.println("\nTasks completed in: "+time+" seconds");
+	}
+}
+
+class LionPenManager {
+	private void removeAnimals() { System.out.println("Removing animals"); }
+	private void cleanPen() { System.out.println("Cleaning the pen"); }
+	private void addAnimals() { System.out.println("Adding animals"); }
+
+	public void performTask() {
+		removeAnimals();
+		cleanPen();
+		addAnimals();
+	}
+	
+}
+
+class LionPenManager2 {
+	private void removeAnimals() { System.out.println(Thread.currentThread().getId() + ":Removing animals"); }
+	private void cleanPen() { System.out.println(Thread.currentThread().getId() + ":Cleaning the pen"); }
+	private void addAnimals() { System.out.println(Thread.currentThread().getId() + ":Adding animals"); }
+
+	public void performTask(CyclicBarrier c1, CyclicBarrier c2) {
+		try {
+			removeAnimals();
+			c1.await();
+			cleanPen();
+			c2.await();
+			addAnimals();
+		} catch (InterruptedException | BrokenBarrierException e) {
+			e.printStackTrace();
+		}
 	}
 }
