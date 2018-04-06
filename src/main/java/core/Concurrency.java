@@ -1,13 +1,18 @@
 package core;
 
 import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
+import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -1721,12 +1726,217 @@ that we have five threads, or five zoo workers in our example, but we have no id
 many tasks need to be performed. When a task gets too complicated, we can split the task
 into multiple other tasks using the fork/join framework.
 
+Introducing Recursion
+---------------------
+The fork/join framework relies on the concept of recursion to solve complex tasks.
+Recursion is the process by which a task calls itself to solve a problem. 
 
+A recursive solution is constructed with a base case and a recursive case:
 
-*/
-		
-		
+-Base case: A non-recursive method that is used to terminate the recursive path
+
+-Recursive case: A recursive method that may call itself one or multiple times to solve a problem
+
+For example, a method that computes the factorial of a number can be expressed as a recursive function. 
+
+In mathematics, a factorial is what you get when you multiply a number by all of the integers below it. 
+
+The factorial of 5 is equal to 5 * 4 * 3 * 2 * 1 = 120.
+
+The following is a recursive factorial function in Java:
+
+	public static int factorial(int n)
+		if(n<=1) return 1;
+		else return n * factorial(n-1);
+	}
+
+In this example, you see that 1 is the base case, and any integer value 
+greater than 1 triggers the recursive case.
+
+One challenge in implementing a recursive solution is always to make sure that the
+recursive process arrives at a base case. 
+
+For example, if the base case is never reached, the solution will continue infinitely 
+and the program will hang. In Java, this will result in a
+StackOverflowError anytime the application recurses too deeply.
+---
+
+Let’s use an array of Double values called weights. 
+For simplicity, let’s say that there are 10 animals in the zoo; thus our array is of size 10.
+
+	Double[] weights = new Double[10];
 	
+We are further constrained by the fact that the animals are spread out, 
+and a single person can weigh at most three animals in an hour. 
+
+If we want to complete this task in an hour, our zoo worker is going to need some help.
+
+Conceptually, we start off with a single zoo worker who realizes that they cannot
+perform all 10 tasks in time. They perform a recursive step by dividing the set of 10
+animals into two sets of 5 animals, one set for each zoo worker. 
+The two zoo workers then further subdivide the set until each zoo worker has at most three animals to weigh, 
+which is the base case in our example.
+
+Applying the fork/join framework requires us to perform three steps:
+1. 	 Create a ForkJoinTask .
+2. 	 Create the ForkJoinPool .
+3. 	 Start the ForkJoinTask .
+
+The first step is the most complex, as it requires defining the recursive process.
+Fortunately, the second and third steps are easy and can each be completed with a single
+line of code. 
+
+For the exam, you should know how to implement the fork/join solution by
+extending one of two classes, RecursiveAction and RecursiveTask, 
+both of which implement the ForkJoinTask interface.
+
+The first class, RecursiveAction, is an abstract class that requires us to implement 
+the compute() method, which returns void, to perform the bulk of the work. 
+
+The second class, RecursiveTask , is an abstract generic class that requires us to implement 
+the compute() method, which returns the generic type, to perform the bulk of the work. 
+
+As you might have guessed, the difference between RecursiveAction and RecursiveTask is analogous to
+the difference between Runnable and Callable, respectively, 
+which you saw at the start of the chapter.
+
+Let’s define a WeighAnimalAction that extends the fork/join class RecursiveAction:
+*/
+
+class WeighAnimalAction extends RecursiveAction {
+
+	private int start;
+	private int end;
+	private Double[] weights;
+	
+	public WeighAnimalAction(Double[] weights, int start, int end) {
+		this.start = start;
+		this.end = end;
+		this.weights = weights;
+	}
+	
+	protected void compute() {
+		if(end-start <= 3)
+			for(int i=start; i<end; i++) {
+				weights[i] = (double)new Random().nextInt(100);
+				System.out.println("Animal Weighed: "+i);
+			}
+		else {
+			int middle = start+((end-start)/2);
+			System.out.println("[start="+start+",middle="+middle+",end="+end+"]");
+			invokeAll(new WeighAnimalAction(weights,start,middle),
+			new WeighAnimalAction(weights,middle,end));
+		}
+	}
+}
+/**
+
+We start off by defining the task and the arguments on which the task will operate, such as
+start , end , and weights . We then override the abstract compute() method, defining our base
+and recursive processes. For the base case, we weigh the animal if there are at most three left
+in the set. For simplicity, this base case assigns a random number from 0 to 100 as the weight.
+For the recursive case, we split the work from one WeighAnimalAction object into two
+WeighAnimalAction instances, dividing the available indices between the two tasks. 
+
+Some subtasks may end up with little or no work to do, which is fine, 
+as long as they terminate in a base case.
+
+----------------------------------------------------------------------
+Dividing tasks into recursive subtasks may not always result in evenly
+divided sets. In our zoo example, one zoo worker may end up with three
+animals to weigh, while others may have only one animal to weigh. The
+goal of the fork/join framework is to break up large tasks into smaller ones,
+not to guarantee every base case ends up being exactly the same size.
+----------------------------------------------------------------------
+
+Once the task class is defined, creating the ForkJoinPool and starting the task is quite easy. 
+The following main() method performs the task on 10 records and outputs the results:
+ */
+
+	System.out.println("\n\n\n Pesando los animales");
+
+	Double[] weights = new Double[10];
+	ForkJoinTask<?> task = new WeighAnimalAction(weights,0,weights.length);
+	ForkJoinPool pool = new ForkJoinPool();
+	pool.invoke(task);
+	
+	// Print results
+	System.out.println();
+	System.out.print("Weights: ");
+	Arrays.asList(weights).stream().forEach(
+	d -> System.out.print(d.intValue()+" "));
+		
+/**
+The key concept to take away from this example is that the process was started as a
+single task, and it spawned additional concurrent tasks to split up the work after it had
+already started. As you may have noticed in the sample output, some tasks reached their
+base case while others were still performing recursive work. Likewise, the order of the
+output cannot be guaranteed, since some zoo workers may finish before others.
+
+Working with a RecursiveTask
+============================
+Let’s say that we want to compute the sum of all weight values while processing the data.
+Instead of extending RecursiveAction , we could extend the generic RecursiveTask to
+calculate and return each sum in the compute() method. The following is an updated
+implementation that uses RecursiveTask<Double> :
+*/
+
+class WeighAnimalTask extends RecursiveTask<Double> {
+	private int start;
+	private int end;
+	private Double[] weights;
+	
+	public WeighAnimalTask(Double[] weights, int start, int end) {
+		this.start = start;
+		this.end = end;
+		this.weights = weights;
+	}
+	
+	protected Double compute() {
+		if(end-start <= 3) {
+			double sum = 0;
+			for(int i=start; i<end; i++) {
+				weights[i] = (double)new Random().nextInt(100);
+				System.out.println("Animal Weighed: "+i);
+				sum += weights[i];
+			}
+			return sum;
+		} else {
+			int middle = start+((end-start)/2);
+			System.out.println("[start="+start+",middle="+middle+",end="+end+"]");
+			RecursiveTask<Double> otherTask = new WeighAnimalTask(weights,start,middle);
+			otherTask.fork();
+			return new WeighAnimalTask(weights,middle,end).compute() + otherTask.join();
+		}
+	}
+}
+
+/**
+While our base case is mostly unchanged, except for returning a sum value, 
+the recursive case is quite different. 
+
+Since the invokeAll() method doesn’t return a value, 
+we instead issue a fork() and join() command to retrieve the recursive data. 
+
+The fork() method instructs the fork/join framework to complete the task in a separate thread, 
+while the join() method causes the current thread to wait for the results.
+
+In this example, we compute the [ middle , end ] range using the current thread, since we
+already have one available, and the [ start , middle ] range using a separate thread. 
+We then combine the results, waiting for the otherTask to complete. 
+We can then update our main() method to include the results of the entire task:
+ */
+	
+ForkJoinTask<Double> task2 = new WeighAnimalTask(weights,0,weights.length);
+ForkJoinPool pool2 = new ForkJoinPool();
+Double sum = pool2.invoke(task2);
+System.out.println("Sum: "+sum);
+
+/**
+Given our previous sample run, the total sum would have been 617.
+PAGE 386
+ */
+
 	}	
 	public static void main(String[] args) {
 		new Concurrency();
