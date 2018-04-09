@@ -1921,8 +1921,8 @@ we instead issue a fork() and join() command to retrieve the recursive data.
 The fork() method instructs the fork/join framework to complete the task in a separate thread, 
 while the join() method causes the current thread to wait for the results.
 
-In this example, we compute the [ middle , end ] range using the current thread, since we
-already have one available, and the [ start , middle ] range using a separate thread. 
+In this example, we compute the [middle,end] range using the current thread, 
+since we already have one available, and the [start,middle] range using a separate thread. 
 We then combine the results, waiting for the otherTask to complete. 
 We can then update our main() method to include the results of the entire task:
  */
@@ -1934,7 +1934,255 @@ System.out.println("Sum: "+sum);
 
 /**
 Given our previous sample run, the total sum would have been 617.
-PAGE 386
+
+OJO OJO OJO OJO OJO OJO OJO OJO OJO OJO OJO OJO OJO OJO OJO OJO OJO OJO
+=======================================================================
+One thing to be careful about when using the fork() and join() methods is the order in
+which they are applied. For instance, while the previous example was multi-threaded, 
+the following variation operates with single-threaded performance:
+
+	RecursiveTask<Double> otherTask = new WeighAnimalTask(weights,start,middle);
+	Double otherResult = otherTask.fork().join();
+	return new WeighAnimalTask(weights,middle,end).compute() + otherResult;
+
+In this example, the current thread calls join(), causing it to wait for the [start,middle]
+subtask to finish before starting on the [middle,end] subtask. In this manner, the results are
+actually performed in a single-threaded manner. 
+
+For the exam, make sure that fork() is called before the current thread begins 
+a subtask and that join() is called after it finishes retrieving the results, 
+in order for them to be done in parallel.
+
+Identifying Fork/Join Issues
+============================
+Unlike many of our earlier Concurrency API classes and structures, the fork/join framework
+can be a bit overwhelming for developers who have not seen it before. With that in mind, we
+have created the following list of tips for identifying issues in a fork/join class on the exam.
+
+Tips for Reviewing a Fork/Join Class:
+-The class should extend RecursiveAction or RecursiveTask.
+
+-If the class extends RecursiveAction, then it should override a protected compute()
+method that takes no arguments and returns void
+
+-If the class extends RecursiveTask, then it should override a protected compute()
+method that takes no arguments and returns a generic type listed in the class definition
+
+-The invokeAll() method takes two instances of the fork/join class and does not return a result
+
+-The fork() method causes a new task to be submitted to the pool and is similar to the
+thread executor submit() method
+
+-The join() method is called after the fork() method and causes the current thread to
+wait for the results of a subtask
+
+-Unlike fork(), calling compute() within a compute() method causes the task to wait
+for the results of the subtask
+
+-The fork() method should be called before the current thread performs a compute()
+operation, with join() called to read the results afterward
+
+-Since compute() takes no arguments, the constructor of the class is often used to pass
+instructions to the task
+
+Identifying Threading Problems
+==============================
+A threading problem can occur in multi-threaded applications when two or more threads
+interact in an unexpected and undesirable way. For example, two threads may block each
+other from accessing a particular segment of code.
+
+The Concurrency API was created to help eliminate potential threading issues common
+to all developers. As you have seen, the Concurrency API creates threads and manages complex 
+thread interactions for you, often in just a few lines of code.
+
+Although the Concurrency API reduces the potential for threading issues, it does not
+eliminate it. In practice, finding and identifying threading issues within an application is
+often one of the most difficult tasks a developer can undertake.
+
+Understanding Liveness
+----------------------
+As you have seen in this chapter, many thread operations can be performed independently,
+but some require coordination. For example, synchronizing on a method requires all
+threads that call the method to wait for other threads to finish before continuing. 
+
+You also saw earlier in the chapter that threads in a CyclicBarrier will each wait for the barrier
+limit to be reached before continuing.
+
+What happens to the application while all of these threads are waiting? 
+In many cases, the waiting is ephemeral and the user has very little idea that any delay has occurred. 
+In other cases, though, the waiting may be extremely long, perhaps infinite.
+
+Liveness is the ability of an application to be able to execute in a timely manner.
+Liveness problems, then, are those in which the application becomes unresponsive or in
+some kind of “stuck” state. 
+
+For the exam, there are three types of liveness issues with
+which you should be familiar: deadlock, starvation, and livelock.
+
+***Deadlock*** occurs when two or more threads are blocked forever, each waiting on the other.
+We can illustrate this principle with the following example. Imagine that our zoo has two
+foxes: Foxy and Tails. Foxy likes to eat first and then drink water, while Tails likes to drink
+water first and then eat. Furthermore, neither animal likes to share, and they will finish
+their meal only if they have exclusive access to both food and water.
+
+The zookeeper places the food on one side of the environment and the water on the other side. 
+Although our foxes are fast, it still takes them 100 milliseconds to run from one
+side of the environment to the other.
+
+What happens if Foxy gets the food first and Tails gets the water first? The following
+application models this behavior:
+
+EXAMPLE: PAGE 388
+
+Preventing Deadlocks
+--------------------
+How do you fix a deadlock once it has occurred? The answer is that you can't in most situations. 
+On the other hand, there are numerous strategies to help prevent deadlocks from ever
+happening in the first place. One common strategy to avoid deadlocks is for all threads to
+order their resource requests. For example, if both foxes have a rule that they need to obtain
+food before water, then the previous deadlock scenario will not happen again. Once one of
+the foxes obtained food, the second fox would wait, leaving the water resource available.
+
+There are some advanced techniques that try to detect and resolve a deadlock in real time, 
+but they are often quite difficult to implement and have limited success in practice. 
+
+In fact, many operating systems ignore the problem altogether and pretend that deadlocks never happen.
+
+***Starvation*** occurs when a single thread is perpetually denied access to a shared resource
+or lock. The thread is still active, but it is unable to complete its work as a result of other
+threads constantly taking the resource that they trying to access.
+In our fox example, imagine that we have a pack of very hungry, very competitive foxes
+in our environment. Every time Foxy stands up to go get food, one of the other foxes sees her
+and rushes to eat before her. Foxy is free to roam around the enclosure, take a nap, and howl
+for a zookeeper but is never able to obtain access to the food. In this example, Foxy literally
+and figuratively experiences starvation. Good thing that this is just a theoretical example!
+
+***Livelock*** occurs when two or more threads are conceptually blocked forever, although they
+are each still active and trying to complete their task. Livelock is a special case of resource
+starvation in which two or more threads actively try to acquire a set of locks, 
+are unable to do so, and restart part of the process.
+
+Livelock is often a result of two threads trying to resolve a deadlock. Returning to our
+fox example, imagine that Foxy and Tails are both holding their food and water resources,
+respectively. They each realize that they cannot finish their meal in this state, so they both
+let go of their food and water, run to opposite side of the environment, and pick up the
+other resource. Now Foxy has the water, Tails has the food, and neither is able to finish
+their meal!
+
+If Foxy and Tails continue this process forever, it is referred to as livelock. 
+Both Foxy and Tails are active, running back and forth across their area, 
+but neither is able to finish their meal. 
+
+Foxy and Tails are executing a form of failed deadlock recovery. 
+Each fox notices that they are potentially entering a deadlock state and responds by releasing all of
+its locked resources. Unfortunately, the lock and unlock process is cyclical, and the two
+foxes are conceptually deadlocked.
+In practice, livelock is often very difficult issue to detect. Threads in a livelock state appear
+active and able to respond to requests, even when they are in fact stuck in an endless cycle.
+
+Managing Race Conditions
+------------------------
+A race condition is an undesirable result that occurs when two tasks, which should be
+completed sequentially, are completed at the same time. We encountered two examples of race
+conditions earlier in the chapter when we introduced synchronization and parallel streams.
+
+While Figure 7.3 shows a classical thread-based example of a race condition, 
+we now provide a more illustrative example. Imagine two zoo patrons, 
+Olivia and Sophia, are signing up for an account on the zoo’s new visitor website. 
+
+Both of them want to use the same username, ZooFan, and they each send requests to create the account at the same
+time, as shown.
+
+----------------------------------------------------
+OLIVIA	>> createUser("ZooFan") >>
+									>> ZooWeb Server
+SOPHIA 	>> createUser("ZooFan")	>>
+----------------------------------------------------
+What result does the web server return when both users attempt to create an account
+with the same username in last example?
+
+Possible Outcomes for This Race Condition
+-----------------------------------------
+-Both users are able to create accounts with username ZooFan.
+
+-Both users are unable to create an account with username ZooFan, returning an error
+message to both users.
+
+-One user is able to create the account with the username ZooFan, while the other user
+receives an error message.
+
+Which of these results is most desirable when designing our web server? The first possibility,
+in which both users are able to create an account with the same username, could cause serious
+problems and break numerous invariants in the system. Assuming that the username is
+required to log into the website, how do they both log in with the same username and different
+passwords? In this case, the website cannot tell them apart. This is the worst possible outcome
+to this race condition, as it causes significant and potentially unrecoverable data problems.
+
+What about the second scenario? If both users are unable to create the account, both
+will receive error messages and be told to try again. In this scenario, the data is protected
+since no two accounts with the same username exist in the system. The users are free to
+try again with the same username, ZooFan, since no one has been granted access to it.
+Although this might seem like a form of livelock, there is a subtle difference. When the
+users try to create their account again, the chances of them hitting a race condition tend
+to diminish. For example, if one user submits their request a few seconds before the other,
+they might avoid another race condition entirely by the system informing the second user
+that the account name is already in use.
+
+The third scenario, in which one user obtains the account while the other does not, is
+often considered the best solution to this type of race condition. Like the second situation,
+we preserve data integrity, but unlike the second situation, at least one user is able to move
+forward on the first request, avoiding additional race condition scenarios. Also unlike the
+previous scenario, we can provide the user who didn’t win the race with a clearer error
+message because we are now sure that the account username is no longer available in the
+system.
+
+For the third scenario, which of the two users should gain access to the account? 
+For race conditions, it often doesn't matter as long as only one player “wins” the race. 
+A common practice is to choose whichever thread made the request first, whenever possible.
+
+Exam Essentials
+===============
+Create concurrent tasks with a thread executor service using Runnable and Callable.    
+An ExecutorService creates and manages a single thread or a pool of threads. 
+Instances of Runnable and Callable can both be submitted to a thread executor and will be completed
+using the available threads in the service. 
+
+Callable differs from Runnable in that Callable returns a generic data type and can throw a checked exception. 
+
+A ScheduledExecutorService can be used to schedule tasks at a fixed rate or a fixed interval between executions.
+Be able to synchronize blocks and methods.   
+
+A monitor can be used to ensure that only one thread processes a particular section of code at a time. 
+In Java, monitors are commonly implemented as synchronized blocks or using synchronized methods. 
+In order to achieve synchronization, two threads must synchronize on the same shared object.
+
+Be able to apply the atomic classes.    An atomic operation is one that occurs without
+interference by another thread. The Concurrency API includes a set of atomic classes that
+are similar to the primitive classes, except that they ensure that operations on them are
+performed atomically.
+
+Be able to use the concurrent collection classes.    The Concurrency API includes numerous
+collections classes that include built-in support for multi-threaded processing, such as
+ConcurrentHashMap and ConcurrentDeque . It also includes a class CopyOnWriteArrayList
+that creates a copy of its underlying list structure every time it is modified and is useful in
+highly concurrent environments.
+Understand the impact of using parallel streams.    The Streams API allows for easy
+creation of parallel streams. Using a parallel stream can cause unexpected results, since the
+order of operations may no longer be predictable. Some operations, such as reduce() and
+collect() , require special consideration to achieve optimal performance when applied to a
+parallel stream.
+Manage process with the CyclicBarrier class and the fork/join framework.    The
+CyclicBarrier class can be used to force a set of threads to wait until they are at a certain
+stage of execution before continuing. The fork/join framework can be used to create a task
+that spawns additional tasks to solve problems recursively.
+Identify potential threading problems.    Deadlock, starvation, and livelock are three
+threading problems that can occur and result in threads never completing their task.
+Deadlock occurs when two or more threads are blocked forever. Starvation occurs when
+a single thread is perpetually denied access to a shared resource. Livelock is a form of
+starvation where two or more threads are active but conceptually blocked forever. Finally,
+race conditions occur when two threads execute at the same time, resulting in an unexpected
+outcome.
+
  */
 
 	}	
