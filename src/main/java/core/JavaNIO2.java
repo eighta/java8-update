@@ -515,12 +515,13 @@ Improving Access with Views
 Up until now, we have been accessing individual file attributes with single method calls.
 While this is functionally correct, there are often costs associated with accessing the
 file that make it far more efficient to retrieve all file metadata attributes in a single call.
-Furthermore, some attributes are file system specific and cannot be easily generalized for all
-file systems.
+Furthermore, some attributes are file system specific and cannot be easily generalized for all file systems.
+
 The NIO.2 API addresses both of these concerns by allowing you to construct views
 for various file systems in a single method call. A view is a group of related attributes for a
 particular file system type. A file may support multiple views, allowing you to retrieve and
 update various sets of information about the file.
+
 If you need to read multiple attributes of a file or directory at a time, the performance
 advantage of using a view may be substantial. Although more attributes are read than in
 a single method call, there are fewer round-trips between Java and the operating system,
@@ -530,38 +531,42 @@ system is more important in determining performance than the number of attribute
 
 That’s not to say that the single method calls we just finished discussing do not have
 their applications. If you only need to read exactly one file attribute, then there is little or
-no performance difference. They also tend to be more convenient to use given their concise
-nature
+no performance difference. They also tend to be more convenient to use given their concise nature
 
 Understanding Views
+-------------------
 To request a view, you need to provide both a path to the file or a directory whose information
 you want to read, as well as a class object, which tells the NIO.2 API method which
 type of view you would like returned.
-The Files API includes two sets of methods of analogous classes for accessing view
-information. The first method, Files.readAttributes(), returns a read-only view of the
-file attributes. The second method, Files.getFileAttributeView(), returns the underlying
-attribute view, and it provides a direct resource for modifying file information.
-Both of these methods can throw a checked IOException, such as when the view class
-type is unsupported. For example, trying to read Windows-based attributes within a Linux
-file system may throw an UnsupportedOperationException.
-Table 9.4 lists the commonly used attributes and view classes; note that the first
-row is required knowledge for the exam. The DOS and POSIX classes are useful for
-reading and modifying operating system–specific properties. They also both inherit
-from their respective attribute and view classes. For example, PosixFileAttributes
-inherits from BasicFileAttributes, just as DosFileAttributeView inherits from
-BasicFileAttributeView, meaning that all of the operations available on the parent class
+
+The Files API includes two sets of methods of analogous classes for accessing view information. 
+
+The first method, Files.readAttributes(), returns a read-only view of the file attributes. 
+The second method, Files.getFileAttributeView(), returns the underlying attribute view, 
+and it provides a direct resource for modifying file information.
+
+Both of these methods can throw a checked IOException, such as when the view class type is unsupported. 
+For example, trying to read Windows-based attributes within a Linux file system may throw an UnsupportedOperationException.
+
+Table 9.4 lists the commonly used attributes and view classes; 
+note that the first row is required knowledge for the exam. 
+
+The DOS and POSIX classes are useful for reading and modifying operating system–specific properties. 
+They also both inherit from their respective attribute and view classes. 
+
+For example, PosixFileAttributes inherits from BasicFileAttributes, 
+just as DosFileAttributeView inherits from BasicFileAttributeView, 
+meaning that all of the operations available on the parent class
 are available in the respective subclasses.
 
+BasicFileAttributes BasicFileAttributeView 
+Basic set of attributes supported by all file systems
 
-BasicFileAttributes BasicFileAttributeView Basic set of attributes supported by
-all file systems
+DosFileAttributes DosFileAttributeView 
+Attributes supported by DOS/Windows-based systems
 
-DosFileAttributes DosFileAttributeView Attributes supported by DOS/
-Windows-based systems
-
-PosixFileAttributes PosixFileAttributeView Attributes supported by POSIX
-systems, such as UNIX, Linux, Mac,
-and so on
+PosixFileAttributes PosixFileAttributeView 
+Attributes supported by POSIX systems, such as UNIX, Linux, Mac, and so on
  */
 		
 		try {
@@ -591,57 +596,72 @@ and so on
 
 /**
 Presenting the New Stream Methods
----------------------------------
+=================================
 Prior to Java 8, the techniques used to perform complex file operations in NIO.2, such as
 searching for a file within a directory tree, were a tad verbose and often required you to
-define an entire class to perform a simple task. When Java 8 was released, new methods
-that rely on streams were added to the NIO.2 specification that allow you to perform many
-of these complex operations with a single line of code.
-Conceptualizing Directory Walking
-Before delving into the new NIO.2 stream methods, let’s review some basic concepts about
-file systems. When we originally described a directory in Chapter 8, we mentioned that it
-was organized in a hierarchical manner. For example, a directory can contain files and other
-directories, which can in turn contain other files and directories. Every record in a file system
-has exactly one parent, with the exception of the root directory, which sits atop everything.
-This is commonly visualized as a tree with a single root node and many branches and
-leaves, as shown in Figure 9.2. Notice that this tree is conceptually equivalent to Figure 8.1.
+define an entire class to perform a simple task. 
 
+When Java 8 was released, new methods that rely on streams were added to the NIO.2 specification 
+that allow you to perform many of these complex operations with a single line of code.
+
+Conceptualizing Directory Walking
+---------------------------------
+Before delving into the new NIO.2 stream methods, let’s review some basic concepts about file systems. 
+When we originally described a directory in Chapter 8, we mentioned that it
+was organized in a hierarchical manner. 
+
+For example, a directory can contain files and other directories, 
+which can in turn contain other files and directories. 
+
+Every record in a file system has exactly one parent, with the exception of the root directory, which sits atop everything.
+This is commonly visualized as a tree with a single root node and many branches and leaves, 
+as shown in Figure 9.2. Notice that this tree is conceptually equivalent to Figure 8.1.
 
 A common task in a file system is to iterate over the descendants of a particular file path,
-either recording information about them or, more commonly, filtering them for a specific
-set of files. For example, you may want to search a folder and print a list of all of the .java
-files. Furthermore, file systems store file records in a hierarchical manner. Generally speaking,
+either recording information about them or, more commonly, filtering them for a specific set of files. 
+For example, you may want to search a folder and print a list of all of the .java files. 
+
+Furthermore, file systems store file records in a hierarchical manner. Generally speaking,
 if you want to search for a file, you have to start with a parent directory, read its child
 elements, then read their children, and so on.
+
 Walking or traversing a directory is the process by which you start with a parent
 directory and iterate over all of its descendants until some condition is met or there are no
 more elements over which to iterate. The starting path is usually a relevant directory to the
 application; after all, it would be time consuming to search the entire file system if your
 application uses only a single directory!
+
 Selecting a Search Strategy
-There are two common strategies associated with walking a directory tree: a depth-first
-search and a breadth-first search. A depth-first search traverses the structure from the root
-to an arbitrary leaf and then navigates back up toward the root, traversing fully down any
-paths it skipped along the way. The search depth is the distance from the root to current
-node. For performance reasons, some processes have a maximum search depth that is used
+---------------------------
+There are two common strategies associated with walking a directory tree:
+a depth-first search and a breadth-first search. 
+
+*A depth-first search traverses the structure from the root to an arbitrary leaf 
+and then navigates back up toward the root, traversing fully down any
+paths it skipped along the way. The search depth is the distance from the root to current node. 
+For performance reasons, some processes have a maximum search depth that is used
 to limit how many levels deep the search goes before stopping.
-Alternatively, a breadth-first search starts at the root and processes all elements of each
-particular depth, or distance from the root, before proceeding to the next depth level. The results
-are ordered by depth, with all nodes at depth 1 read before all nodes at depth 2, and so on.
+
+*Alternatively, a breadth-first search starts at the root and processes all elements of each
+particular depth, or distance from the root, before proceeding to the next depth level. 
+The results are ordered by depth, with all nodes at depth 1 read before all nodes at depth 2, and so on.
+
 For the exam, you don’t have to understand the details of each search strategy that Java
 employs; you just need to be aware that the Streams API uses depth-first searching with a
 default maximum depth of Integer.MAX_VALUE.
 
 Walking a Directory
+-------------------
 As presented in Chapter 4, Java 8 includes a new Streams API for performing complex
 operations in a single line of code using functional programming and lambda expressions.
 The first newly added NIO.2 stream-based method that we will cover is one used to
-traverse a directory. The Files.walk(path) method returns a Stream<Path> object that
-traverses the directory in a depth-first, lazy manner.
+traverse a directory. 
 
-By lazy, we mean the set of elements is built and read while the directory is being
-traversed. For example, until a specific subdirectory is reached, its child elements are not
-loaded. This performance enhancement allows the process to be run on directories with a
+The Files.walk(path) method returns a Stream<Path> object that traverses the directory in a depth-first, lazy manner.
+
+By lazy, we mean the set of elements is built and read while the directory is being traversed. 
+For example, until a specific subdirectory is reached, its child elements are not loaded. 
+This performance enhancement allows the process to be run on directories with a
 large number of descendants in a reasonable manner.
 
 ... (EXAMPLE ABOVE(
@@ -653,25 +673,16 @@ large number of descendants in a reasonable manner.
 		try {
 			DirectoryStream<Path> newDirectoryStream = Files.newDirectoryStream(directory);
 			
-			/*
-			 While browsing the NIO.2 API, you may come across the method Files.newDirectoryStream()
-along with the generic object it returns, DirectoryStream<Path>. The method behaves quite
-similarly to Files.walk(), except the DirectoryStream<Path> object that it returns does not
-inherit from the java.util.stream.Stream class. In other words, despite its name, it is not
-actually a stream as described in Chapter 4, and therefore none of the useful stream operations
-can be applied.*/
-			
-			
+/*While browsing the NIO.2 API, you may come across the method Files.newDirectoryStream()
+along with the generic object it returns, DirectoryStream<Path>. 
+
+The method behaves quite similarly to Files.walk(), except the DirectoryStream<Path> object that it returns 
+does not inherit from the java.util.stream.Stream class. In other words, despite its name, it is not
+actually a stream as described in Chapter 4, and therefore none of the useful stream operations can be applied.*/
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-	
-		
-		
-		
-		
 		
 		try {
 			//FileAttribute<?> attrs = null;
