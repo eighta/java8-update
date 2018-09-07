@@ -5,3 +5,6 @@ https://www.tutorialspoint.com/design_pattern/filter_pattern.htm
 
 Writing Clean Predicates with Java 8 
 https://dzone.com/articles/writing-clean-predicates-java
+
+Good Book
+http://www.kitabxana.net/files/books/file/1354098277.pdf
